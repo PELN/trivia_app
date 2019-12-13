@@ -5,19 +5,20 @@ import io from 'socket.io-client';
 import Messages from '../Messages/Messages';
 import RoomInfo from '../RoomInfo/RoomInfo';
 import GameStart from '../GameStart/GameStart';
+import { Link } from 'react-router-dom';
 
 let socket;
 
 const Game = ({ location }) => {
+    const server = 'localhost:5000';
     const [username, setUsername] = useState('');
     const [room, setRoom] = useState('');
     const [users, setUsers] = useState([]);
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
-  
-    const server = 'localhost:5000';
+    const [error, setError] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
 
-    // retrieve data that user has entered in JoinGame and set states
     useEffect( () => {
         const { username, room } = queryString.parse(location.search);
         socket = io.connect(server)
@@ -28,16 +29,16 @@ const Game = ({ location }) => {
         socket.emit('joinGame', { username, room }, (error) => {
             console.log(`${username} has joined the game in ${room}, with id: ${socket.id}`);
             if (error) {
-                alert(error);
-                // user shouldn't be redirected to game page, if username is taken
-                // find out how join link can be made different and still send params
-            }
+                setError(true);
+                setErrorMsg(error);
+                console.log(error);
+            };
         });
 
         return () => {
             socket.emit('disconnect');
             socket.disconnect();
-        }
+        };
     }, [server, location.search]); //only rerender useEffect if any of these changes
 
     useEffect( () => {
@@ -48,14 +49,13 @@ const Game = ({ location }) => {
         socket.on('roomData', ({ users }) => {
             setUsers(users);
         })
-    }, []); //when messages array changes rerender effect
+    }, []);
 
     useEffect(() => {
         socket.on('message', (message) => {
-            // use spread operator to send whole array + add the message to it
-          setMessages([...messages, message ]);
+            setMessages([...messages, message ]); // use spread operator to send whole array + add the message to it
         });
-    }, [messages]);
+    }, [messages]); //when messages array changes rerender effect
 
     console.log('***** users *******',users);
     // console.log('message', message);
@@ -63,10 +63,21 @@ const Game = ({ location }) => {
 
     return(
         <div>
-            <h1>Game start</h1>
-            <RoomInfo room={room} users={users}/>
-            <Messages messages={messages} />
-            <GameStart/>
+            { error === false ? (
+                <div>
+                    <h1>Game start</h1>
+                    <RoomInfo room={room} users={users}/>
+                    <Messages messages={messages} />
+                    <GameStart users={users}/>
+                </div>
+            ) : (
+                <div>
+                    <h1>Go back</h1>
+                    {errorMsg}
+                    <div><Link to={'/'}>Go Back</Link></div>
+                </div>
+                )
+            }
         </div>
     );
 };

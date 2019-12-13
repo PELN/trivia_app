@@ -10,7 +10,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server, {
     pingInterval: 10000,
-    pingTimeout: 5000,
+    pingTimeout: 60000,
     cookie: false
 });
 
@@ -21,8 +21,8 @@ io.on('connect', (socket) => {
     socket.on('joinGame', ({ username, room }, callback) => {
         const { user, error } = addUser({ id: socket.id, username, room, score: 0 });
         if (error) return callback(error);
-
         socket.join(user.room);
+        console.log(getUsersInRoom(user.room).length)
         socket.emit('message', { text: `Welcome to the game in ${user.room}, ${user.username}.` })
         socket.broadcast.to(user.room).emit('message', { text: `${user.username} has joined the game!` });
         console.log(user.username, 'has joined room:', room, 'with id:', socket.id);
@@ -39,6 +39,11 @@ io.on('connect', (socket) => {
     });
 
 
+    socket.on('gameInfo', ({ user, question, answers}, callback) => {
+        socket.broadcast.to(user.room).emit('question', { question: `${question}`});
+        socket.broadcast.to(user.room).emit('answers', { answers: `${answers}`});
+        callback();
+    });
 
     socket.on('disconnect', () => {
         const user = removeUser(socket.id);
