@@ -23,66 +23,56 @@ io.on('connect', (socket) => {
     console.log('new connection', socket.id);
     
 
-    socket.on('createRoom', ({ roomName, masterName }, callback) => {
+    socket.on('createRoom', ({ roomName }, callback) => {
         const room = {
             id: uuidv1(),
             name: roomName,
             sockets: [],
-            players: []
+            users: []
         };
         rooms[roomName] = room;
         joinRoom(socket, room);
         console.log('****roooms*****', rooms);
-        console.log('master name:', masterName);
         callback();
     });
 
 
-    socket.on('joinRoom', ({ joinRoomName, playerName }, callback) => {
-        // console.log('***ROOMS***', rooms);
-        // console.log('***ROOMNAME***', joinRoomName);
+    socket.on('joinRoom', ({ joinRoomName }, callback) => {
+        console.log('***ROOMS***', rooms);
+        console.log('***ROOMNAME***', joinRoomName);
+
         const room = rooms[joinRoomName];
-        // console.log('***ROOM***', room);
+        console.log('***ROOM***', room);
 
-        console.log('player name', playerName);
-        joinRoom(socket, room, playerName);
+        joinRoom(socket, room);
         callback();
     });
 
-    const joinRoom = (socket, room, playerName) => {
+    const joinRoom = (socket, room) => {
         room.sockets.push(socket);
         socket.join(room.id, () => {
             socket.roomId = room.id;
             socket.roomName = room.name;
 
-            // if it is not the first user (master), then add user to array
-            if(room.sockets.length !== 1){
-                // push users to array, set score to 0
-                // socket.id is not the same!!!!
-                const player = { id: socket.id, username: playerName, score: 0 }
-                room.players.push(player);
-                console.log(room.players);
-            }
+            // if(room.sockets.length !== 1){
+            // }
 
             console.log(socket.id, "Joined room:", room.id);
-            socket.emit('message', { text: `Welcome ${playerName} to the game in ${room.name}.` });
-            socket.broadcast.to(room.id).emit('message', { text: `${playerName} has joined the game!` });
+            socket.emit('message', { text: `Welcome to the game in ${room.name}.` });
         });
     };
 
 
     socket.on('ready', ({ roomName }) => {
         console.log(socket.id, 'is ready!!');
-        // console.log('SOCKET NAME',roomName);
+        console.log('SOCKET NAME',roomName);
         const room = rooms[roomName];
-        // console.log('ROOOOOM', room);
+        console.log('ROOOOOM', room);
         if (room.sockets.length > 2) {
             for (const client of room.sockets) {
                 client.emit('initGame', { text: `The game begins.` });
             };
-        } else {
-            console.log('not enough users to start game');
-        }
+        };
     });
 
 
@@ -114,12 +104,11 @@ io.on('connect', (socket) => {
 
 
     socket.on('disconnect', () => {
-        // console.log('user left');
-        // console.log(socket.id);
-        // delete socket[socket.id];
-
-        // io.to(room.id).emit('message', { text: `${playerName} has left.` });
-        // console.log(`${playerName} has left`);
+        // delete client[socket.id];
+        // if(user) {
+        //   io.to(user.room).emit('message', { text: `${user.username} has left.` });
+        //   console.log(`${user.username} has left`);
+        // };
     });
 });
 

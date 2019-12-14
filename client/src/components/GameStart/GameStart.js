@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import GameInfo from '../GameInfo/GameInfo';
+// import GameQuestion from '../GameQuestion/GameQuestion';
 
-import './GameStart.css';
-import io from 'socket.io-client';
+// import './GameStart.css';
+// import io from 'socket.io-client';
 
 // ***** TODOS ******
 // fetch questions
@@ -17,14 +17,12 @@ import io from 'socket.io-client';
 // when game finish, set score to whatever it is, emit it to server, save it in mogodb
 // new game - set states to empty, 0, false
 
-let socket;
+// let socket;
 
-const GameStart = ({ users }) => {
-    const server = 'localhost:5000';
-    const [clicked, setClick] = useState(false);
-    const [questions, setQuestions] = useState([]);
-    const [currentQuestion, setCurrentQuestion] = useState(''); // index 0, first question object?
-    const [currentOptions, setCurrentOptions] = useState([]);
+const GameStart = () => {
+    // const server = 'localhost:5000';
+    // const [clicked, setClick] = useState(false);
+
     // const [userAnswer, setUserAnswer] = useState('');
     // const [correctAnswer, setCorrectAnswer] = useState('');
     // const [score, setScore] = useState(0);
@@ -32,45 +30,19 @@ const GameStart = ({ users }) => {
     // const [error, setError] = useState('');
     // const [loading, setLoading] = useState('');
 
-    socket = io.connect(server)
+    // socket = io.connect(server)
 
 
-    // fetch questions
-    useEffect(() => {
-        const getQuestions = async () => {
-            const response = await fetch("https://opentdb.com/api.php?amount=5&type=multiple&encode=url3986")
-                .then(response => response.json())
-                .then(questions => {
-                    setQuestions(questions.results);
-                    setCurrentQuestion(questions.results[0]);
-                    const options = questions.results[0].incorrect_answers
-                    const correctAnswer = questions.results[0].correct_answer
-                    // console.log('!!!!! options', options, correctAnswer);
-                    setCurrentOptions([...options, correctAnswer]); //options has to have random position
-                });
-        };
-        getQuestions();
-    }, []);
-        
-    console.log('questions array', questions);
-    console.log('current question', currentQuestion);
-    console.log('current options', currentOptions);
 
 
-    useEffect(() => {
-        socket.on('question', ({ currentQuestion }))
-        socket.on('answers', ({ currentOptions }))
-    });
-
-
-    const handleClick = () => {
-        console.log('click');
-        setClick(true);
-    }
+    // const handleClick = () => {
+    //     console.log('click');
+    //     setClick(true);
+    // }
 
     return (
         <div>
-        <GameInfo currentQuestion={currentQuestion} currentOptions={currentOptions}/>
+        {/* <GameQuestion currentQuestion={currentQuestion} currentOptions={currentOptions}/> */}
         {/* { clicked === false ? (
             <button onClick={handleClick}>Start game</button>
         ) : (

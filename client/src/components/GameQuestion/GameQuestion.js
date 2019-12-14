@@ -1,7 +1,7 @@
 import React from 'react';
 
-const GameInfo = ({ currentQuestion, currentOptions }) => (
-
+const GameQuestion = ({ currentQuestion, currentOptions }) => (
+    // decode url encoding
     <div>
         <h1>Let the game begin</h1>
         <h3>Category: {decodeURIComponent(currentQuestion.category)}</h3>
@@ -21,4 +21,4 @@ const GameInfo = ({ currentQuestion, currentOptions }) => (
 
 );
 
-export default GameInfo;
+export default GameQuestion;
