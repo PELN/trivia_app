@@ -3,6 +3,7 @@ import queryString from 'query-string';
 import io from 'socket.io-client';
 
 import Messages from '../Messages/Messages';
+import GameQuestion from '../GameQuestion/GameQuestion';
 
 let socket;
 
@@ -10,10 +11,14 @@ const GamePlayer = ({ location }) => {
     const server = 'localhost:5000';
     const [joinRoomName, setJoinRoomName] = useState('');
     const [playerName, setPlayerName] = useState('');
+
+    const [error, setError] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
     
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
 
+    const [gameState, setGameState] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState('');
     const [currentOptions, setCurrentOptions] = useState([]);
     const [currentRound, setCurrentRound] = useState(0);
@@ -26,10 +31,14 @@ const GamePlayer = ({ location }) => {
         setPlayerName(playerName);
         console.log('room:', joinRoomName, 'name:', playerName);
     
-        socket.emit('joinRoom', { joinRoomName, playerName }, () => {
-            console.log(`****** WELCOME to room: ${joinRoomName}, ${playerName} with id: ${socket.id}`)
+        socket.emit('joinRoom', { joinRoomName, playerName }, (error) => {
+            console.log(`****** WELCOME to room: ${joinRoomName}, ${playerName} with id: ${socket.id}`);
+            if (error) {
+                setError(true);
+                setErrorMsg(error);
+                console.log(error);
+            };
         });
-        
         
         return () => {
             socket.emit('disconnect');
@@ -53,32 +62,40 @@ const GamePlayer = ({ location }) => {
 
     useEffect(() => {
         socket.on('currentRound', (currentQuestion, currentOptions, currentRound) => {
-            console.log(currentQuestion)
-            console.log(currentOptions)
-            console.log(currentRound)
+            console.log(currentQuestion);
+            console.log(currentOptions);
+            console.log(currentRound);
 
             setCurrentQuestion(currentQuestion);
             setCurrentOptions(currentOptions);
             setCurrentRound(currentRound);
+            setGameState(true);
         });
     },[currentQuestion]);
+
+
     return(
         <div>
-            <h1>Game player</h1>
-            <Messages messages={messages} />
-            <h3>Category: {decodeURIComponent(currentQuestion.category)}</h3>
-            <h1>Question: {decodeURIComponent(currentQuestion.question)}</h1>
-            
-            <div className="container">
-                {currentOptions.map((option, index) => 
-                    <div className="choice-container" key={index}>
-                        <p className="choice-text" key={index}>
-                            {decodeURIComponent(option)}
-                        </p>
+            {error === true ? ( 
+                <div>
+                    {errorMsg.error}
+                    <a href="/">Go back</a>
+                </div>
+            ) : ( 
+                <div>
+                { gameState === false ? (
+                    <div>
+                        <h1>Game player</h1>
+                        <h3>Waiting for master to start the game...</h3>
+                        <Messages messages={messages} />
                     </div>
-                    )
+                ) : (
+                    <GameQuestion currentQuestion={currentQuestion} currentOptions={currentOptions} currentRound={currentRound} playerName={playerName} />
+                )
                 }
-            </div>
+                </div>
+            )
+            }
         </div>
     );
 }

@@ -3,7 +3,6 @@ const socketio = require('socket.io');
 const http = require('http');
 const PORT = 5000;
 
-const { addUser, removeUser, getUser, getUsersInRoom } = require('./users');
 const router = require('./routes/router');
 
 const app = express();
@@ -43,8 +42,20 @@ io.on('connect', (socket) => {
         // console.log('***ROOMNAME***', joinRoomName);
         const room = rooms[joinRoomName];
         // console.log('***ROOM***', room);
-
         console.log('player name', playerName);
+
+        // check if rooms array is empty
+        // check if joinRoomName exists in rooms
+        if (typeof room === 'undefined' ) {
+            console.log('No rooms created with that name');
+            return callback({error: "No rooms created with that name"});
+        };
+        // check if player has input a name
+        if (playerName === '') {
+            console.log('You have to fill out player name');
+            return callback({error: "You have to fill out player name"});
+        };
+        
         joinRoom(socket, room, playerName);
         callback();
     });
@@ -62,7 +73,7 @@ io.on('connect', (socket) => {
                 const player = { id: socket.id, username: playerName, score: 0 }
                 room.players.push(player);
                 console.log(room.players);
-            }
+            };
 
             console.log(socket.id, "Joined room:", room.id);
             socket.emit('message', { text: `Welcome ${playerName} to the game in ${room.name}.` });
@@ -71,7 +82,7 @@ io.on('connect', (socket) => {
     };
 
 
-    socket.on('ready', ()  => {
+    socket.on('ready', (callback)  => {
         // console.log('SOCKET NAME',roomName);
         const room = rooms[socket.roomName];
         // console.log('ROOOOOM', room);
@@ -79,15 +90,23 @@ io.on('connect', (socket) => {
         if (room.sockets.length > 2) {
             for (const client of room.sockets) {
                 client.emit('initGame');
-                console.log("Doing solid work", room.sockets.length)
+                console.log("Doing solid work", room.sockets.length);
+                return callback({error: "Game initialized - Click start game"});
             }
         } else {
             console.log('not enough users to start game');
+            return callback({error: "Not enough users to start game - needs at least 2 players"});
         }
+        callback();
     });
 
     socket.on('startGame', ({ currentOptions, currentQuestion, round }) => {
         socket.broadcast.to(socket.roomId).emit('currentRound', {question: `${currentQuestion}`}, currentOptions, round);
+    });
+
+    socket.on('playerChoice', ({ playerName, playerChoice }) => {
+        console.log('player name:', playerName, '|||||', 'choice:', playerChoice);
+        
     });
 
 
