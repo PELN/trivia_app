@@ -13,7 +13,12 @@ const GameMaster = ({ location }) => {
     
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
+
     // const [gameStart, setGameStart] = useState(false);
+    const [questions, setQuestions] = useState([]);
+    const [currentQuestion, setCurrentQuestion] = useState(''); // index 0, first question object?
+    const [currentOptions, setCurrentOptions] = useState([]);
+    const [round, setRound] = useState(0);
 
     useEffect(() => {
         const { roomName, masterName } = queryString.parse(location.search);
@@ -47,20 +52,51 @@ const GameMaster = ({ location }) => {
     }, [messages]); //when messages array changes rerender effect
 
 
-    const GameStart = () => {
-        //fetch api
-        socket.emit('ready', { roomName }, () => {
+    const InitGame = () => {
+        console.log("initializing game")
+        socket.emit('ready', () => {
         });
     };
     
+    const StartGame = () => {
+        console.log("round", round);
+        setCurrentQuestion(questions[round].question);
+        const options = questions[round].incorrect_answers
+        const correctAnswer = questions[round].correct_answer
+        setCurrentOptions([...options, correctAnswer]); //correctAnswer has to have random position
+        setRound(round + 1);
+        console.log("CUrrent option", currentOptions);
+        socket.emit('startGame', { currentQuestion, currentOptions, round }, () => {});
+        
+    };
 
+    useEffect(() => {
+        socket.on('initGame', () => {
+            //fetch api
+            setRound(0)
+            const response = fetch("https://opentdb.com/api.php?amount=5&type=multiple&encode=url3986")
+                .then(response => response.json())
+                .then(res => {
+                    console.log(res);
+                    setQuestions(res.results);
+                    setCurrentQuestion(res.results[round].question);
+                    const options = res.results[round].incorrect_answers;
+                    const correctAnswer = res.results[round].correct_answer;
+                    setCurrentOptions([...options, correctAnswer]); //correctAnswer has to have random position
+            });
+
+        });
+
+    }, []);
+    console.log(messages);
 
 
     return(
         <div>
             <h1>Game master</h1>
             <Messages messages={messages} />
-            <button onClick={GameStart}>Start Game</button>
+            <button onClick={InitGame}>Init Game</button>
+            <button onClick={StartGame}>Start Game</button>
         </div>
     );
 }

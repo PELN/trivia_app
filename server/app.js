@@ -52,13 +52,13 @@ io.on('connect', (socket) => {
     const joinRoom = (socket, room, playerName) => {
         room.sockets.push(socket);
         socket.join(room.id, () => {
+            // saving room info to communicate with later (don't have to pass variables around with the info)
             socket.roomId = room.id;
             socket.roomName = room.name;
 
             // if it is not the first user (master), then add user to array
             if(room.sockets.length !== 1){
                 // push users to array, set score to 0
-                // socket.id is not the same!!!!
                 const player = { id: socket.id, username: playerName, score: 0 }
                 room.players.push(player);
                 console.log(room.players);
@@ -71,46 +71,27 @@ io.on('connect', (socket) => {
     };
 
 
-    socket.on('ready', ({ roomName }) => {
-        console.log(socket.id, 'is ready!!');
+    socket.on('ready', ()  => {
         // console.log('SOCKET NAME',roomName);
-        const room = rooms[roomName];
+        const room = rooms[socket.roomName];
         // console.log('ROOOOOM', room);
+        console.log("Coming through")
         if (room.sockets.length > 2) {
             for (const client of room.sockets) {
-                client.emit('initGame', { text: `The game begins.` });
-            };
+                client.emit('initGame');
+                console.log("Doing solid work", room.sockets.length)
+            }
         } else {
             console.log('not enough users to start game');
         }
     });
 
+    socket.on('startGame', ({ currentOptions, currentQuestion, round }) => {
+        socket.broadcast.to(socket.roomId).emit('currentRound', {question: `${currentQuestion}`}, currentOptions, round);
+    });
 
-
-
-    // socket.on('joinGame', ({ username, room }, callback) => {
-    //     const { user, error } = addUser({ id: socket.id, username, room, score: 0 });
-    //     if (error) return callback(error);
-    //     socket.join(user.room);
-
-    //     console.log(getUsersInRoom(user.room).length)
-
-    //     socket.emit('message', { text: `Welcome to the game in ${user.room}, ${user.username}.` })
-    //     socket.broadcast.to(user.room).emit('message', { text: `${user.username} has joined the game!` });
-    //     console.log(user.username, 'has joined room:', room, 'with id:', socket.id);
 
     //     io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room) });
-        
-    //     socket.on('gameInfo', ({ user, question, answers}, callback) => {
-    //         socket.broadcast.to(user.room).emit('question', { question: `${question}`});
-    //         socket.broadcast.to(user.room).emit('answers', { answers: `${answers}`});
-    //         callback();
-    //     });
-
-    //     callback();
-    // });
-
-
 
 
     socket.on('disconnect', () => {
