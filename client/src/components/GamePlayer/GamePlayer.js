@@ -22,7 +22,8 @@ const GamePlayer = ({ location }) => {
     const [currentQuestion, setCurrentQuestion] = useState('');
     const [currentOptions, setCurrentOptions] = useState([]);
     const [currentRound, setCurrentRound] = useState(0);
-    const [clickActivated, setClickActivated] = useState(true);
+
+    const [clickActivated, setClickActivated] = useState(true); // used to prevent many clicks on one option
 
     useEffect(() => {
         const { joinRoomName, playerName } = queryString.parse(location.search);
@@ -72,11 +73,13 @@ const GamePlayer = ({ location }) => {
             setCurrentRound(currentRound);
             console.log("This is the clicky status:", clickActivated)
             setGameState(true);
-            setClickActivated(true);
+
+            setClickActivated(true); // used to prevent many clicks on one option
         });
     },[currentQuestion]);
 
-        
+    
+    // used to prevent many clicks on one option
     const handleClickChange = (val) => {
         console.log("This is the value of clicky", val);
         setClickActivated(val);
@@ -89,7 +92,7 @@ const GamePlayer = ({ location }) => {
                     {errorMsg.error}
                     <a href="/">Go back</a>
                 </div>
-            ) : ( 
+            ) : (
                 <div>
                 { gameState === false ? (
                     <div>
@@ -98,8 +101,16 @@ const GamePlayer = ({ location }) => {
                         <Messages messages={messages} />
                     </div>
                 ) : (
-                    <GameQuestion currentQuestion={currentQuestion} currentOptions={currentOptions} currentRound={currentRound} playerName={playerName} socket={socket} clickStatus={clickActivated} onClickChange={handleClickChange}/>
-                )
+                    <GameQuestion 
+                        currentQuestion={currentQuestion} 
+                        currentOptions={currentOptions} 
+                        currentRound={currentRound} 
+                        playerName={playerName} 
+                        socket={socket} 
+                        clickStatus={clickActivated} 
+                        onClickChange={handleClickChange}
+                    />
+                    )
                 }
                 </div>
             )

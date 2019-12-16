@@ -117,12 +117,12 @@ io.on('connect', (socket) => {
         const room = rooms[socket.roomName];
         room.players[playerName].score += 10000;
         console.log(room.players[playerName]);
-
-        // find the highscore
-        // if score is a tie: emit 'its a tie'
     });
 
     socket.on('endGame', () => {
+        // calculate highscore
+        // send highscores back to user
+        // if score is a tie: emit 'its a tie'
         
     });
 
