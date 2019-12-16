@@ -16,9 +16,6 @@ const GameQuestion = ({ currentQuestion, currentOptions, currentRound, playerNam
         setClickActivated(false); // used to prevent many clicks on one option
         onClickChange(false); // used to prevent many clicks on one option
     };
-
-
-    // make form where user can save score
     
     return(
         <div>

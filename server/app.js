@@ -123,9 +123,14 @@ io.on('connect', (socket) => {
         // calculate highscore
         // send highscores back to user
         // if score is a tie: emit 'its a tie'
-        
-    });
+        const room = rooms[socket.roomName];
+        // console.log(room.players[playerName]);
 
+        res = Object.values(room.players);
+        console.log('GAME END SCORES', res);
+        io.to(room.id).emit('scores', res);
+    });
+    
     socket.on('disconnect', () => {
         // console.log('user left');
         // console.log(socket.id);

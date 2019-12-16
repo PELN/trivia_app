@@ -4,6 +4,7 @@ import io from 'socket.io-client';
 
 import Messages from '../Messages/Messages';
 import GameQuestion from '../GameQuestion/GameQuestion';
+import EndGame from '../EndGame/EndGame';
 
 let socket;
 
@@ -24,6 +25,8 @@ const GamePlayer = ({ location }) => {
     const [currentRound, setCurrentRound] = useState(0);
 
     const [clickActivated, setClickActivated] = useState(true); // used to prevent many clicks on one option
+
+    const [scores, setScores] = useState([]);
 
     useEffect(() => {
         const { joinRoomName, playerName } = queryString.parse(location.search);
@@ -53,14 +56,15 @@ const GamePlayer = ({ location }) => {
         socket.on('message', (text) => {
             setMessage(text);
         });
-
     }, []);
+
 
     useEffect(() => {
         socket.on('message', (message) => {
             setMessages([...messages, message ]); // use spread operator to send whole array + add the message to it
         });
     }, [messages]); //when messages array changes rerender effect
+
 
     useEffect(() => {
         socket.on('currentRound', (currentQuestion, currentOptions, currentRound) => {
@@ -85,6 +89,15 @@ const GamePlayer = ({ location }) => {
         setClickActivated(val);
     }
 
+    useEffect(() => {
+        socket.on('scores', (finalScore) => {
+            console.log('scores in gameplayer', finalScore);
+
+            // setScores(finalScore);
+        });
+    }, []);
+
+
     return(
         <div>
             {error === true ? (
@@ -101,7 +114,9 @@ const GamePlayer = ({ location }) => {
                         <Messages messages={messages} />
                     </div>
                 ) : (
-                    <GameQuestion 
+                    // if game has ended - show endgame component instead of game question
+                    <div>
+                        <GameQuestion 
                         currentQuestion={currentQuestion} 
                         currentOptions={currentOptions} 
                         currentRound={currentRound} 
@@ -109,7 +124,10 @@ const GamePlayer = ({ location }) => {
                         socket={socket} 
                         clickStatus={clickActivated} 
                         onClickChange={handleClickChange}
-                    />
+                        />
+                        
+                        <EndGame scores={scores} />
+                    </div>
                     )
                 }
                 </div>

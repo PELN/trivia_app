@@ -88,16 +88,15 @@ const GameMaster = ({ location }) => {
             getQuestion(questions);
         } else {
             // end game
-            socket.emit('endGame', () => {
-                
-            });
+            console.log('game has ended');
+            socket.emit('endGame');
         };
     };
 
     useEffect(() => {
         socket.on('initGame', () => {
             setRound(0); // init game to 0
-            const response = fetch("https://opentdb.com/api.php?amount=5&type=multiple&encode=url3986")
+            const response = fetch("https://opentdb.com/api.php?amount=1&type=multiple&encode=url3986")
                 .then(response => response.json())
                 .then(res => {
                     console.log("This is res and round",res, round);
@@ -124,7 +123,6 @@ const GameMaster = ({ location }) => {
                     console.log(playerName, 'has answered correctly!');
                     // GIVE POINT
                     socket.emit('updateScore', playerName );
-
                 } else {
                     console.log(playerName, 'has NOOOT answered correctly!');
                     // NO POINT
