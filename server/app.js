@@ -100,13 +100,14 @@ io.on('connect', (socket) => {
         callback();
     });
 
-    socket.on('startGame', ({ currentOptions, currentQuestion, round }) => {
+    socket.on('ShowQuestion', ({ currentOptions, currentQuestion, round }) => {
         socket.broadcast.to(socket.roomId).emit('currentRound', {question: `${currentQuestion}`}, currentOptions, round);
     });
 
-    socket.on('playerChoice', ({ playerName, playerChoice }) => {
-        console.log('player name:', playerName, '|||||', 'choice:', playerChoice);
-        
+    socket.on('playerChoice', ({ playerName, choice, currentRound }) => {
+        console.log('player name:', playerName, '|||||', 'choice:', choice, '||||||', currentRound);
+        rooms[socket.roomName].sockets[0].emit('playerChoice', playerName, choice, currentRound);
+
     });
 
 

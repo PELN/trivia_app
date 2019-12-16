@@ -24,6 +24,8 @@ const GameMaster = ({ location }) => {
     const [correctAnswer, setCorrectAnswer] = useState('');
     const [round, setRound] = useState(0);
 
+    const [score, setScore] = useState([]);
+    
     useEffect(() => {
         const { roomName, masterName } = queryString.parse(location.search);
         socket = io.connect(server);
@@ -54,7 +56,7 @@ const GameMaster = ({ location }) => {
             setMessages([...messages, message ]); // use spread operator to send whole array + add the message to it
         });
     }, [messages]); //when messages array changes rerender effect
-    console.log(messages);
+    // console.log(messages);
 
 
     const InitGame = () => {
@@ -68,40 +70,74 @@ const GameMaster = ({ location }) => {
         });
     };
     
-    const StartGame = () => {
+    const ShowQuestion = () => {
         console.log("Current options", currentOptions);
         // send first question
-        socket.emit('startGame', { currentQuestion, currentOptions, round }, () => {});
-        console.log("round", round);
+        socket.emit('ShowQuestion', { currentQuestion, currentOptions, round }, () => {});
+        console.log("round", round);        
+    };
+    
+    const NextQuestion = () => {
         // update next round question but not if the round(5) is equal to question length(5)
         // because this would request a value in the array that does not exist (Out of bounds)
         if (round !== questions.length) {
-            setCurrentQuestion(questions[round].question);
-            const options = questions[round].incorrect_answers
-            const correctAnswer = questions[round].correct_answer
-            setCurrentOptions([...options, correctAnswer]); //correctAnswer has to have random position
-            setCorrectAnswer(correctAnswer);
-            setRound(round + 1);   
+            console.log(questions);
+            getQuestion(questions);
         };
     };
 
     useEffect(() => {
         socket.on('initGame', () => {
-            //fetch api
             setRound(0); // init game to 0
             const response = fetch("https://opentdb.com/api.php?amount=5&type=multiple&encode=url3986")
                 .then(response => response.json())
                 .then(res => {
-                    console.log(res);
+                    console.log("This is res and round",res, round);
                     setQuestions(res.results);
-                    setCurrentQuestion(res.results[round].question);
-                    const options = res.results[round].incorrect_answers;
-                    const correctAnswer = res.results[round].correct_answer;
-                    setCurrentOptions([...options, correctAnswer]); //correctAnswer has to have random position
-                    setRound(round + 1);
+                    getQuestion(res.results);
             });
         });
     }, []);
+
+
+    const getQuestion = (questionObj) => {
+        setCurrentQuestion(questionObj[round].question);
+        const options = questionObj[round].incorrect_answers;
+        const correctOption = questionObj[round].correct_answer;
+        setCurrentOptions([...options, correctOption]); //correctAnswer has to have random position
+        setCorrectAnswer(correctOption);
+        setRound(prevRound => {return prevRound + 1}); // function that increments the round
+    };
+
+    // check if playerChoice is correct
+    useEffect(() => {
+        socket.on('playerChoice', (playerName, playerChoice, currentRound) => {
+            // console.log("This is question", questions[round-1]);
+            // console.log("Current Question here", currentQuestion);
+            // console.log(playerName, playerChoice);
+            // console.log(round);
+
+            // if it is not undefined
+            if(typeof questions[round-1] !== 'undefined' && currentRound === round) {
+                console.log('CORRECT ANSWER IS:', decodeURIComponent(correctAnswer));           
+                if (playerChoice === decodeURIComponent(correctAnswer)) {
+                    console.log(playerName, 'has answered correctly!');
+                    // GIVE POINT
+
+                    // create object (for each player) and push it to empty array of scores
+                    // increment score if answer is correct
+                    // [ scores: {player: playerName, score: 0}, {player: playerName, score: 0}]
+                    // setScore
+                    // delete score from player object in app.js ???? 
+
+                } else {
+                    console.log(playerName, 'has NOOOT answered correctly!');
+                    // DONT GIVE POINT
+                }
+            }
+        });
+    },[round]);
+
 
 
     return(
@@ -110,9 +146,11 @@ const GameMaster = ({ location }) => {
             {errorMsg.error}
             <Messages messages={messages} />
             <button onClick={InitGame}>Init Game</button>
-            <button onClick={StartGame}>Start Game</button>
+            {/* if game has ended (length of questions = 5), change button to 'next' instead of 'start' */}
+            <button onClick={ShowQuestion}>Show question</button> {/* This button used to be start game */}
+            <button onClick={NextQuestion}>Next question</button>
         </div>
     );
-}
+};
 
 export default GameMaster;

@@ -90,7 +90,7 @@ const GamePlayer = ({ location }) => {
                         <Messages messages={messages} />
                     </div>
                 ) : (
-                    <GameQuestion currentQuestion={currentQuestion} currentOptions={currentOptions} currentRound={currentRound} playerName={playerName} />
+                    <GameQuestion currentQuestion={currentQuestion} currentOptions={currentOptions} currentRound={currentRound} playerName={playerName} socket={socket}/>
                 )
                 }
                 </div>
