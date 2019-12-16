@@ -24,7 +24,7 @@ const GameMaster = ({ location }) => {
     const [correctAnswer, setCorrectAnswer] = useState('');
     const [round, setRound] = useState(0);
 
-    const [score, setScore] = useState([]);
+    const [players, setPlayers] = useState([]);
     
     useEffect(() => {
         const { roomName, masterName } = queryString.parse(location.search);
@@ -49,6 +49,14 @@ const GameMaster = ({ location }) => {
         socket.on('message', (text) => {
             setMessage(text);
         });
+        
+        // get array with player data from server
+        // socket.on('playerData', ({ players }) => {
+        //     setPlayers(players);
+        //     console.log('Players in game', players);
+        //     console.log('Player score', players[0]);
+        // });
+
     }, []);
 
     useEffect(() => {
@@ -73,7 +81,7 @@ const GameMaster = ({ location }) => {
     const ShowQuestion = () => {
         console.log("Current options", currentOptions);
         // send first question
-        socket.emit('ShowQuestion', { currentQuestion, currentOptions, round }, () => {});
+        socket.emit('showQuestion', { currentQuestion, currentOptions, round }, () => {});
         console.log("round", round);        
     };
     
@@ -97,7 +105,32 @@ const GameMaster = ({ location }) => {
                     getQuestion(res.results);
             });
         });
-    }, []);
+
+
+        // check if answer is correct, emit playername to server, if they answered correctly
+        socket.on('playerChoice', (playerName, playerChoice, currentRound) => {
+            // console.log("This is question", questions[round-1]);
+            // console.log("Current Question here", currentQuestion);
+            // console.log(playerName, playerChoice);
+            // console.log(round);
+
+            // if it is not undefined
+            console.log(round,currentRound);
+            if(typeof questions[round-1] !== 'undefined' && currentRound === round) {
+                console.log('CORRECT ANSWER IS:', decodeURIComponent(correctAnswer));           
+                if (playerChoice === decodeURIComponent(correctAnswer)) {
+                    console.log(playerName, 'has answered correctly!');
+                    // GIVE POINT
+                    socket.emit('updateScore', playerName );
+
+                } else {
+                    console.log(playerName, 'has NOOOT answered correctly!');
+                    // NO POINT
+                }
+            }
+        });
+
+    }, [round]);
 
 
     const getQuestion = (questionObj) => {
@@ -110,33 +143,9 @@ const GameMaster = ({ location }) => {
     };
 
     // check if playerChoice is correct
-    useEffect(() => {
-        socket.on('playerChoice', (playerName, playerChoice, currentRound) => {
-            // console.log("This is question", questions[round-1]);
-            // console.log("Current Question here", currentQuestion);
-            // console.log(playerName, playerChoice);
-            // console.log(round);
+    // useEffect(() => {
 
-            // if it is not undefined
-            if(typeof questions[round-1] !== 'undefined' && currentRound === round) {
-                console.log('CORRECT ANSWER IS:', decodeURIComponent(correctAnswer));           
-                if (playerChoice === decodeURIComponent(correctAnswer)) {
-                    console.log(playerName, 'has answered correctly!');
-                    // GIVE POINT
-
-                    // create object (for each player) and push it to empty array of scores
-                    // increment score if answer is correct
-                    // [ scores: {player: playerName, score: 0}, {player: playerName, score: 0}]
-                    // setScore
-                    // delete score from player object in app.js ???? 
-
-                } else {
-                    console.log(playerName, 'has NOOOT answered correctly!');
-                    // DONT GIVE POINT
-                }
-            }
-        });
-    },[round]);
+    // },[round]);
 
 
 

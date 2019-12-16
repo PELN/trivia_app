@@ -21,7 +21,7 @@ rooms = [];
 io.on('connect', (socket) => {
     console.log('new connection', socket.id);
     
-
+    // game master creates room and joins it
     socket.on('createRoom', ({ roomName, masterName }, callback) => {
         const room = {
             id: uuidv1(),
@@ -30,13 +30,13 @@ io.on('connect', (socket) => {
             players: []
         };
         rooms[roomName] = room;
-        joinRoom(socket, room);
+        joinRoom(socket, room, masterName);
         console.log('****roooms*****', rooms);
         console.log('master name:', masterName);
         callback();
     });
 
-
+    // player joins game that game master has created
     socket.on('joinRoom', ({ joinRoomName, playerName }, callback) => {
         // console.log('***ROOMS***', rooms);
         // console.log('***ROOMNAME***', joinRoomName);
@@ -60,6 +60,7 @@ io.on('connect', (socket) => {
         callback();
     });
 
+    // function for joining room (used by createRoom and joinRoom)
     const joinRoom = (socket, room, playerName) => {
         room.sockets.push(socket);
         socket.join(room.id, () => {
@@ -69,19 +70,19 @@ io.on('connect', (socket) => {
 
             // if it is not the first user (master), then add user to array
             if(room.sockets.length !== 1){
-                // push users to array, set score to 0
                 const player = { id: socket.id, username: playerName, score: 0 }
-                room.players.push(player);
-                console.log(room.players);
+                rooms[socket.roomName].players[playerName] = player; // structure rooms array with keys of roomName and playerName
             };
 
             console.log(socket.id, "Joined room:", room.id);
             socket.emit('message', { text: `Welcome ${playerName} to the game in ${room.name}.` });
             socket.broadcast.to(room.id).emit('message', { text: `${playerName} has joined the game!` });
+            // io.to(room.id).emit('playerData', { players: room.players });
+            console.log('!!!!!!! LOOK', room.id, room.players)
         });
     };
 
-
+    // let master know if there are enough players to emit 'initGame', which will fetch from API
     socket.on('ready', (callback)  => {
         // console.log('SOCKET NAME',roomName);
         const room = rooms[socket.roomName];
@@ -91,27 +92,35 @@ io.on('connect', (socket) => {
             for (const client of room.sockets) {
                 client.emit('initGame');
                 console.log("Doing solid work", room.sockets.length);
-                return callback({error: "Game initialized - Click start game"});
+                callback({error: "Game initialized - Click start game"}); // SHOULD NOOT BE ERROR, CHANGE TO MSG?
             }
         } else {
             console.log('not enough users to start game');
-            return callback({error: "Not enough users to start game - needs at least 2 players"});
+            callback({error: "Not enough users to start game - needs at least 2 players"});
         }
         callback();
     });
 
-    socket.on('ShowQuestion', ({ currentOptions, currentQuestion, round }) => {
+    // GameMaster emits the question to server, and server broadcasts question to all players
+    socket.on('showQuestion', ({ currentOptions, currentQuestion, round }) => {
         socket.broadcast.to(socket.roomId).emit('currentRound', {question: `${currentQuestion}`}, currentOptions, round);
     });
 
+    // emit player choice from GameQuestion to GameMaster, the first socket
     socket.on('playerChoice', ({ playerName, choice, currentRound }) => {
         console.log('player name:', playerName, '|||||', 'choice:', choice, '||||||', currentRound);
         rooms[socket.roomName].sockets[0].emit('playerChoice', playerName, choice, currentRound);
+    });
+
+    // get playerName from GameMaster, set score for player in players array
+    socket.on('updateScore', (playerName) => {
+
+        const room = rooms[socket.roomName];
+        room.players[playerName].score += 10000;
+        console.log(room.players[playerName]);
 
     });
 
-
-    //     io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room) });
 
 
     socket.on('disconnect', () => {
