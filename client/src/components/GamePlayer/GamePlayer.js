@@ -22,6 +22,7 @@ const GamePlayer = ({ location }) => {
     const [currentQuestion, setCurrentQuestion] = useState('');
     const [currentOptions, setCurrentOptions] = useState([]);
     const [currentRound, setCurrentRound] = useState(0);
+    const [clickActivated, setClickActivated] = useState(true);
 
     useEffect(() => {
         const { joinRoomName, playerName } = queryString.parse(location.search);
@@ -69,14 +70,21 @@ const GamePlayer = ({ location }) => {
             setCurrentQuestion(currentQuestion);
             setCurrentOptions(currentOptions);
             setCurrentRound(currentRound);
+            console.log("This is the clicky status:", clickActivated)
             setGameState(true);
+            setClickActivated(true);
         });
     },[currentQuestion]);
 
+        
+    const handleClickChange = (val) => {
+        console.log("This is the value of clicky", val);
+        setClickActivated(val);
+    }
 
     return(
         <div>
-            {error === true ? ( 
+            {error === true ? (
                 <div>
                     {errorMsg.error}
                     <a href="/">Go back</a>
@@ -90,7 +98,7 @@ const GamePlayer = ({ location }) => {
                         <Messages messages={messages} />
                     </div>
                 ) : (
-                    <GameQuestion currentQuestion={currentQuestion} currentOptions={currentOptions} currentRound={currentRound} playerName={playerName} socket={socket}/>
+                    <GameQuestion currentQuestion={currentQuestion} currentOptions={currentOptions} currentRound={currentRound} playerName={playerName} socket={socket} clickStatus={clickActivated} onClickChange={handleClickChange}/>
                 )
                 }
                 </div>

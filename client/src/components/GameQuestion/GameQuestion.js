@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import './GameQuestion.css';
 
-const GameQuestion = ({ currentQuestion, currentOptions, currentRound, playerName, socket }) => {
+const GameQuestion = ({ currentQuestion, currentOptions, currentRound, playerName, socket, clickStatus, onClickChange }) => {
     const [playerChoice, setPlayerChoice] = useState('');
-    const [optionClicked, setOptionClicked] = useState(false);
+    const [clickActivated, setClickActivated] = useState(clickStatus);
 
     const clickOption = (event) => {
         const choice = event.target.innerText;
@@ -12,34 +12,29 @@ const GameQuestion = ({ currentQuestion, currentOptions, currentRound, playerNam
             console.log('player name', playerName, 'choice', playerChoice);
         });
         setPlayerChoice(choice);
-        setOptionClicked(true);
+        setClickActivated(false);
+        onClickChange(false);
     };
-    
-    console.log(playerChoice, playerName);
-
-
 
     return(
         <div>
-            {optionClicked === false ? (
-                <div>
-                    <h1>Round {currentRound}</h1>
-                    <h2>Question: {decodeURIComponent(currentQuestion.question)}</h2>
-                    
-                    <div className="container">
-                        {currentOptions.map((option, index) =>
-                            <div className="options-container" key={index} onClick={clickOption}>
-                                {decodeURIComponent(option)}
+            <h1>Round {currentRound}</h1>
+            <h2>Question: {decodeURIComponent(currentQuestion.question)}</h2>
+            
+            <div className="container">
+                {currentOptions.map((option, index) =>
+                    clickStatus === true ? (
+                        <div className="options-container" key={index} onClick={clickOption}>
+                            {decodeURIComponent(option)}
                             </div>
-                            )
-                        }
-                    </div>
-                </div>
-            ) : (
-                <div>
-                    <h1>option clicked</h1>
-                </div>
-            )}
+                        ) : (
+                        <div className="options-container" key={index}>
+                            {decodeURIComponent(option)}
+                        </div>
+                        )
+                    )
+                }
+            </div>
         </div>
     );
 };

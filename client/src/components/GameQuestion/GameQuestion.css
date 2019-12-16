@@ -8,8 +8,18 @@
     padding: 10px;
 }
 
-.options-container:hover {
+/* .options-container:hover {
     cursor: pointer;
     background-color: rgb(0, 161, 107);
     color: white;
+} */
+
+/* .options-container:active {
+    background-color: yellow;
+}
+ */
+
+.options-container:hover,
+.options-container:active {
+    background-color: rgb(245, 163, 56);
 }

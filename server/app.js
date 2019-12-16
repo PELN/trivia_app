@@ -78,7 +78,7 @@ io.on('connect', (socket) => {
             socket.emit('message', { text: `Welcome ${playerName} to the game in ${room.name}.` });
             socket.broadcast.to(room.id).emit('message', { text: `${playerName} has joined the game!` });
             // io.to(room.id).emit('playerData', { players: room.players });
-            console.log('!!!!!!! LOOK', room.id, room.players)
+            // console.log('!!!!!!! LOOK', room.id, room.players)
         });
     };
 
@@ -114,14 +114,17 @@ io.on('connect', (socket) => {
 
     // get playerName from GameMaster, set score for player in players array
     socket.on('updateScore', (playerName) => {
-
         const room = rooms[socket.roomName];
         room.players[playerName].score += 10000;
         console.log(room.players[playerName]);
 
+        // find the highscore
+        // if score is a tie: emit 'its a tie'
     });
 
-
+    socket.on('endGame', () => {
+        
+    });
 
     socket.on('disconnect', () => {
         // console.log('user left');

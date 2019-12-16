@@ -24,7 +24,7 @@ const GameMaster = ({ location }) => {
     const [correctAnswer, setCorrectAnswer] = useState('');
     const [round, setRound] = useState(0);
 
-    const [players, setPlayers] = useState([]);
+    // const [players, setPlayers] = useState([]);
     
     useEffect(() => {
         const { roomName, masterName } = queryString.parse(location.search);
@@ -49,13 +49,6 @@ const GameMaster = ({ location }) => {
         socket.on('message', (text) => {
             setMessage(text);
         });
-        
-        // get array with player data from server
-        // socket.on('playerData', ({ players }) => {
-        //     setPlayers(players);
-        //     console.log('Players in game', players);
-        //     console.log('Player score', players[0]);
-        // });
 
     }, []);
 
@@ -82,7 +75,9 @@ const GameMaster = ({ location }) => {
         console.log("Current options", currentOptions);
         // send first question
         socket.emit('showQuestion', { currentQuestion, currentOptions, round }, () => {});
-        console.log("round", round);        
+        console.log("round", round);
+        
+        //set timeout, countdown until next question
     };
     
     const NextQuestion = () => {
@@ -91,6 +86,11 @@ const GameMaster = ({ location }) => {
         if (round !== questions.length) {
             console.log(questions);
             getQuestion(questions);
+        } else {
+            // end game
+            socket.emit('endGame', () => {
+                
+            });
         };
     };
 
@@ -114,8 +114,10 @@ const GameMaster = ({ location }) => {
             // console.log(playerName, playerChoice);
             // console.log(round);
 
+            // if countdown is at 0, collect what user has clicked
+
+            // console.log(round, currentRound);
             // if it is not undefined
-            console.log(round,currentRound);
             if(typeof questions[round-1] !== 'undefined' && currentRound === round) {
                 console.log('CORRECT ANSWER IS:', decodeURIComponent(correctAnswer));           
                 if (playerChoice === decodeURIComponent(correctAnswer)) {
@@ -130,6 +132,12 @@ const GameMaster = ({ location }) => {
             }
         });
 
+        // get array with player data from server
+        // socket.on('playerData', ({ players }) => {
+        //     setPlayers(players);
+        //     console.log('Players in game', players);
+        // });
+
     }, [round]);
 
 
@@ -141,11 +149,6 @@ const GameMaster = ({ location }) => {
         setCorrectAnswer(correctOption);
         setRound(prevRound => {return prevRound + 1}); // function that increments the round
     };
-
-    // check if playerChoice is correct
-    // useEffect(() => {
-
-    // },[round]);
 
 
 
