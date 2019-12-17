@@ -19,14 +19,16 @@ const GamePlayer = ({ location }) => {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
 
-    const [gameState, setGameState] = useState(false);
+    const [gameStart, setGameStart] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState('');
     const [currentOptions, setCurrentOptions] = useState([]);
     const [currentRound, setCurrentRound] = useState(0);
 
     const [clickActivated, setClickActivated] = useState(true); // used to prevent many clicks on one option
 
-    const [scores, setScores] = useState([]);
+    // game end
+    const [players, setPlayers] = useState([]); // to get final score
+    const [gameEnd, setGameEnd] = useState(false); // to get final score
 
     useEffect(() => {
         const { joinRoomName, playerName } = queryString.parse(location.search);
@@ -76,8 +78,8 @@ const GamePlayer = ({ location }) => {
             setCurrentOptions(currentOptions);
             setCurrentRound(currentRound);
             console.log("This is the clicky status:", clickActivated)
-            setGameState(true);
-
+            setGameStart(true);
+            setGameEnd(false);
             setClickActivated(true); // used to prevent many clicks on one option
         });
     },[currentQuestion]);
@@ -90,10 +92,10 @@ const GamePlayer = ({ location }) => {
     }
 
     useEffect(() => {
-        socket.on('scores', (finalScore) => {
-            console.log('scores in gameplayer', finalScore);
-
-            // setScores(finalScore);
+        socket.on('scores', (players) => {
+            // console.log('scores in gameplayer', players);
+            setPlayers(players);
+            setGameEnd(true);
         });
     }, []);
 
@@ -107,7 +109,7 @@ const GamePlayer = ({ location }) => {
                 </div>
             ) : (
                 <div>
-                { gameState === false ? (
+                { gameStart === false ? (
                     <div>
                         <h1>Game player</h1>
                         <h3>Waiting for master to start the game...</h3>
@@ -116,17 +118,20 @@ const GamePlayer = ({ location }) => {
                 ) : (
                     // if game has ended - show endgame component instead of game question
                     <div>
-                        <GameQuestion 
-                        currentQuestion={currentQuestion} 
-                        currentOptions={currentOptions} 
-                        currentRound={currentRound} 
-                        playerName={playerName} 
-                        socket={socket} 
-                        clickStatus={clickActivated} 
-                        onClickChange={handleClickChange}
-                        />
-                        
-                        <EndGame scores={scores} />
+                        { gameEnd === false ? (
+                                <GameQuestion 
+                                currentQuestion={currentQuestion} 
+                                currentOptions={currentOptions} 
+                                currentRound={currentRound} 
+                                playerName={playerName} 
+                                socket={socket} 
+                                clickStatus={clickActivated} 
+                                onClickChange={handleClickChange}
+                                />
+                        ) : (
+                            <EndGame players={players} />
+                            )
+                        }
                     </div>
                     )
                 }
@@ -135,6 +140,6 @@ const GamePlayer = ({ location }) => {
             }
         </div>
     );
-}
+};
 
 export default GamePlayer;

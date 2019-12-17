@@ -115,18 +115,17 @@ io.on('connect', (socket) => {
     // get playerName from GameMaster, set score for player in players array
     socket.on('updateScore', (playerName) => {
         const room = rooms[socket.roomName];
-        room.players[playerName].score += 10000;
+        room.players[playerName].score += 1;
         console.log(room.players[playerName]);
     });
 
     socket.on('endGame', () => {
-        // calculate highscore
-        // send highscores back to user
+        // send scores back to user
         // if score is a tie: emit 'its a tie'
         const room = rooms[socket.roomName];
         // console.log(room.players[playerName]);
-
-        res = Object.values(room.players);
+    
+        res = Object.values(room.players); // to send the array with keys that has objects as values
         console.log('GAME END SCORES', res);
         io.to(room.id).emit('scores', res);
     });
@@ -134,8 +133,8 @@ io.on('connect', (socket) => {
     socket.on('disconnect', () => {
         // console.log('user left');
         // console.log(socket.id);
-        // delete socket[socket.id];
 
+        // const room = rooms[socket.roomName];
         // io.to(room.id).emit('message', { text: `${playerName} has left.` });
         // console.log(`${playerName} has left`);
     });

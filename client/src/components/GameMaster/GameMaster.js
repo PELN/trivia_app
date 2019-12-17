@@ -76,8 +76,6 @@ const GameMaster = ({ location }) => {
         // send first question
         socket.emit('showQuestion', { currentQuestion, currentOptions, round }, () => {});
         console.log("round", round);
-        
-        //set timeout, countdown until next question
     };
     
     const NextQuestion = () => {
@@ -87,16 +85,16 @@ const GameMaster = ({ location }) => {
             console.log(questions);
             getQuestion(questions);
         } else {
-            // end game
+            // reached max round - end game
             console.log('game has ended');
-            socket.emit('endGame');
+            socket.emit('endGame');            
         };
     };
 
     useEffect(() => {
         socket.on('initGame', () => {
             setRound(0); // init game to 0
-            const response = fetch("https://opentdb.com/api.php?amount=1&type=multiple&encode=url3986")
+            const response = fetch("https://opentdb.com/api.php?amount=3&type=multiple&encode=url3986")
                 .then(response => response.json())
                 .then(res => {
                     console.log("This is res and round",res, round);
@@ -104,7 +102,9 @@ const GameMaster = ({ location }) => {
                     getQuestion(res.results);
             });
         });
+    }, []);
 
+    useEffect(() => {
 
         // check if answer is correct, emit playername to server, if they answered correctly
         socket.on('playerChoice', (playerName, playerChoice, currentRound) => {
