@@ -3,8 +3,6 @@ const socketio = require('socket.io');
 const http = require('http');
 const PORT = 5000;
 
-const router = require('./routes/router');
-
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server, {
@@ -13,9 +11,21 @@ const io = socketio(server, {
     cookie: false
 });
 
-const uuidv1 = require('uuid/v1');
+app.use(express.json()); // to be able to get the req.body, res.body as json
+const scores = require('./routes/scores');
+app.use('/scores', scores);
 
-app.use(router);
+// MONGO 
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/trivia', {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true
+}, console.log('COONNECTED TO MONGO'));
+
+
+
+// SOCKET
+const uuidv1 = require('uuid/v1');
 rooms = [];
 
 io.on('connect', (socket) => {
