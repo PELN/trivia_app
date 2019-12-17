@@ -7,7 +7,9 @@ const Score = require('../models/Score');
 
 // GET  api/scores
 router.get('/', (req, res) => {
-    Score.find().then(scores => res.json(scores));
+    Score.find()
+        .sort({score: -1}) // sort by highest score, desc
+        .then(scores => res.json(scores));
 });
 
 

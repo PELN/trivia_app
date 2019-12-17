@@ -77,6 +77,7 @@ io.on('connect', (socket) => {
             // saving room info to communicate with later (don't have to pass variables around with the info)
             socket.roomId = room.id;
             socket.roomName = room.name;
+            socket.username = playerName;
 
             // if it is not the first user (master), then add user to array
             if(room.sockets.length !== 1){
@@ -119,7 +120,8 @@ io.on('connect', (socket) => {
     // emit player choice from GameQuestion to GameMaster, the first socket
     socket.on('playerChoice', ({ playerName, choice, currentRound }) => {
         console.log('player name:', playerName, '|||||', 'choice:', choice, '||||||', currentRound);
-        rooms[socket.roomName].sockets[0].emit('playerChoice', playerName, choice, currentRound);
+        const room = rooms[socket.roomName];
+        room.sockets[0].emit('playerChoice', playerName, choice, currentRound);
     });
 
     // get playerName from GameMaster, set score for player in players array
@@ -131,13 +133,17 @@ io.on('connect', (socket) => {
 
     socket.on('endGame', () => {
         // send scores back to user
-        // if score is a tie: emit 'its a tie'
         const room = rooms[socket.roomName];
-        // console.log(room.players[playerName]);
     
         res = Object.values(room.players); // to send the array with keys that has objects as values
         console.log('GAME END SCORES', res);
         io.to(room.id).emit('scores', res);
+
+        for (const client of res) {
+            console.log('hello client',client);
+            socket.to(client.id).emit("finalPlayerInfo", client);
+        };
+
     });
     
     socket.on('disconnect', () => {

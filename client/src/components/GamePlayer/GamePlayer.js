@@ -29,6 +29,7 @@ const GamePlayer = ({ location }) => {
     // game end
     const [players, setPlayers] = useState([]); // to get final score
     const [gameEnd, setGameEnd] = useState(false); // to get final score
+    const [player, setPlayer] = useState(''); // to get each client final score
 
     useEffect(() => {
         const { joinRoomName, playerName } = queryString.parse(location.search);
@@ -77,7 +78,7 @@ const GamePlayer = ({ location }) => {
             setCurrentQuestion(currentQuestion);
             setCurrentOptions(currentOptions);
             setCurrentRound(currentRound);
-            console.log("This is the clicky status:", clickActivated)
+            console.log("This is the clicky status:", clickActivated);
             setGameStart(true);
             setGameEnd(false);
             setClickActivated(true); // used to prevent many clicks on one option
@@ -97,7 +98,15 @@ const GamePlayer = ({ location }) => {
             setPlayers(players);
             setGameEnd(true);
         });
+        
+        // each player/client info to save score
+        socket.on('finalPlayerInfo', (client) => {
+            console.log(client);
+            setPlayer(client);
+        });
+
     }, []);
+
 
 
     return(
@@ -129,7 +138,7 @@ const GamePlayer = ({ location }) => {
                                 onClickChange={handleClickChange}
                                 />
                         ) : (
-                            <EndGame players={players} />
+                            <EndGame players={players} player={player} />
                             )
                         }
                     </div>
