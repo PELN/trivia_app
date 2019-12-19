@@ -23,7 +23,8 @@ const GameMaster = ({ location }) => {
     const [correctAnswer, setCorrectAnswer] = useState('');
     const [round, setRound] = useState(0);
 
-    // const [players, setPlayers] = useState([]);
+    const [error, setError] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
     
     useEffect(() => {
         const { roomName, masterName } = queryString.parse(location.search);
@@ -33,8 +34,13 @@ const GameMaster = ({ location }) => {
         setMasterName(masterName);
         console.log('room:', roomName, 'name:', masterName);
 
-        socket.emit('createRoom', { roomName, masterName }, () => {
-            console.log(`****** WELCOME to room: ${roomName}, ${masterName} with id: ${socket.id}`);
+        socket.emit('createRoom', { roomName, masterName }, (error) => {
+            // console.log(`****** WELCOME to room: ${roomName}, ${masterName} with id: ${socket.id}`);
+            if (error) {
+                setError(true);
+                setErrorMsg(error);
+                console.log(error);
+            };
         });
 
         return () => {
@@ -105,12 +111,7 @@ const GameMaster = ({ location }) => {
         // check if answer is correct, emit playername to server, if they answered correctly
         socket.on('playerChoice', (playerName, playerChoice, currentRound) => {
             // console.log("This is question", questions[round-1]);
-            // console.log("Current Question here", currentQuestion);
             // console.log(playerName, playerChoice);
-            // console.log(round);
-
-            // if countdown is at 0, collect what user has clicked
-
             // console.log(round, currentRound);
             // if it is not undefined
             if(typeof questions[round-1] !== 'undefined' && currentRound === round) {
@@ -120,18 +121,11 @@ const GameMaster = ({ location }) => {
                     // GIVE POINT
                     socket.emit('updateScore', playerName );
                 } else {
-                    console.log(playerName, 'has NOOOT answered correctly!');
+                    console.log(playerName, 'has NOT answered correctly!');
                     // NO POINT
                 }
             }
         });
-
-        // get array with player data from server
-        // socket.on('playerData', ({ players }) => {
-        //     setPlayers(players);
-        //     console.log('Players in game', players);
-        // });
-
     }, [round]);
 
 
@@ -144,17 +138,24 @@ const GameMaster = ({ location }) => {
         setRound(prevRound => {return prevRound + 1}); // function that increments the round
     };
 
-
-
     return(
         <div>
-            <h1>Game master</h1>
-            {serverRes.res}
-            <Messages messages={messages} />
-            <button onClick={InitGame}>Init Game</button>
-            {/* if game has ended (length of questions = 5), change button to 'next' instead of 'start' */}
-            <button onClick={ShowQuestion}>Show question</button> {/* This button used to be start game */}
-            <button onClick={NextQuestion}>Next question</button>
+            {error === true ? (
+                <div>
+                    {errorMsg.error}
+                    <a href="/">Go back</a>
+                </div>
+            ) : (
+                <div>
+                    <h1>Game master</h1>
+                    {serverRes.res}
+                    <Messages messages={messages} />
+                    <button onClick={InitGame}>Init Game</button>
+                    {/* if game has ended (length of questions = 5), change button to 'next' instead of 'start' */}
+                    <button onClick={ShowQuestion}>Show question</button> {/* This button used to be start game */}
+                    <button onClick={NextQuestion}>Next question</button>
+                </div>
+            )}
         </div>
     );
 };

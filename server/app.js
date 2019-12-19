@@ -36,6 +36,12 @@ io.on('connect', (socket) => {
     
     // game master creates room and joins it
     socket.on('createRoom', ({ roomName, masterName }, callback) => {
+        // check if room name exists before it is created
+        if (rooms[roomName]) {
+            console.log('ROOM NAME ALREADY EXIST');
+            return callback({ error: "Room already exists with that name, try another!" });
+        }
+
         const room = {
             id: uuidv1(),
             name: roomName,
@@ -43,9 +49,11 @@ io.on('connect', (socket) => {
             players: []
         };
         rooms[roomName] = room;
+
+
         joinRoom(socket, room, masterName);
         console.log('****roooms*****', rooms);
-        console.log('master name:', masterName);
+
         callback();
     });
 
@@ -76,6 +84,7 @@ io.on('connect', (socket) => {
 
     // function for joining room (used by createRoom and joinRoom)
     const joinRoom = (socket, room, playerName) => {
+        
         room.sockets.push(socket);
         socket.join(room.id, () => {
             // saving room info to communicate with later (don't have to pass variables around with the info)
@@ -134,7 +143,7 @@ io.on('connect', (socket) => {
     socket.on('updateScore', (playerName) => {
         const room = rooms[socket.roomName];
         room.players[playerName].score += 1;
-        console.log(room.players[playerName]);
+        // console.log(room.players[playerName]);
     });
 
     socket.on('endGame', () => {
