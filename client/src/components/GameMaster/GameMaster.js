@@ -11,8 +11,7 @@ const GameMaster = ({ location }) => {
     const [roomName, setRoomName] = useState('');
     const [masterName, setMasterName] = useState('');
     
-    const [error, setError] = useState(false);
-    const [errorMsg, setErrorMsg] = useState('');
+    const [serverRes, setServerRes] = useState('');
 
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
@@ -62,12 +61,9 @@ const GameMaster = ({ location }) => {
 
     const InitGame = () => {
         console.log("initializing game")
-        socket.emit('ready', (error) => {
-            if (error) {
-                setError(true);
-                setErrorMsg(error);
-                console.log(error);
-            };
+        socket.emit('ready', (res) => {
+            setServerRes(res);
+            console.log(res);
         });
     };
     
@@ -153,7 +149,7 @@ const GameMaster = ({ location }) => {
     return(
         <div>
             <h1>Game master</h1>
-            {errorMsg.error}
+            {serverRes.res}
             <Messages messages={messages} />
             <button onClick={InitGame}>Init Game</button>
             {/* if game has ended (length of questions = 5), change button to 'next' instead of 'start' */}

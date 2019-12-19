@@ -51,24 +51,25 @@ io.on('connect', (socket) => {
 
     // player joins game that game master has created
     socket.on('joinRoom', ({ joinRoomName, playerName }, callback) => {
-        // console.log('***ROOMS***', rooms);
-        // console.log('***ROOMNAME***', joinRoomName);
         const room = rooms[joinRoomName];
-        // console.log('***ROOM***', room);
         console.log('player name', playerName);
 
-        // check if rooms array is empty
-        // check if joinRoomName exists in rooms
+        // check if rooms array is empty AND check if joinRoomName exists in rooms
         if (typeof room === 'undefined' ) {
             console.log('No rooms created with that name');
-            return callback({error: "No rooms created with that name"});
+            return callback({ error: "No rooms created with that name" });
         };
         // check if player has input a name
         if (playerName === '') {
             console.log('You have to fill out player name');
-            return callback({error: "You have to fill out player name"});
+            return callback({ error: "You have to fill out player name" });
         };
-        
+        // check if playername already exists in room
+        if (room.players[playerName]){
+            console.log(playerName, "IS ALREADY IN THE ROOM");
+            return callback ({ error: "A player with that name is already in the room" });
+        };
+
         joinRoom(socket, room, playerName);
         callback();
     });
@@ -81,18 +82,20 @@ io.on('connect', (socket) => {
             socket.roomId = room.id;
             socket.roomName = room.name;
             socket.username = playerName;
-
+            
             // if it is not the first user (master), then add user to array
             if(room.sockets.length !== 1){
                 const player = { id: socket.id, username: playerName, score: 0 }
                 rooms[socket.roomName].players[playerName] = player; // structure rooms array with keys of roomName and playerName
+                // console.log('hellooo', room.players[playerName].username);
             };
 
-            console.log(socket.id, "Joined room:", room.id);
+            // console.log(socket.id, "Joined room:", room.id);
             socket.emit('message', { text: `Welcome ${playerName} to the game in ${room.name}.` });
             socket.broadcast.to(room.id).emit('message', { text: `${playerName} has joined the game!` });
-            // io.to(room.id).emit('playerData', { players: room.players });
-            // console.log('!!!!!!! LOOK', room.id, room.players)
+
+            allPlayersInRoom = Object.values(room.players);
+            io.to(room.id).emit('playerData', allPlayersInRoom);
         });
     };
 
@@ -101,16 +104,16 @@ io.on('connect', (socket) => {
         // console.log('SOCKET NAME',roomName);
         const room = rooms[socket.roomName];
         // console.log('ROOOOOM', room);
-        console.log("Coming through")
+        // console.log("Coming through");
         if (room.sockets.length > 2) {
             for (const client of room.sockets) {
                 client.emit('initGame');
                 console.log("Doing solid work", room.sockets.length);
-                callback({error: "Game initialized - Click start game"}); // SHOULD NOOT BE ERROR, CHANGE TO MSG?
+                callback({ res: "Game initialized - Click start game" });
             }
         } else {
             console.log('not enough users to start game');
-            callback({error: "Not enough users to start game - needs at least 2 players"});
+            callback({ res: "Not enough users to start game - needs at least 2 players" });
         }
         callback();
     });
@@ -143,7 +146,7 @@ io.on('connect', (socket) => {
         io.to(room.id).emit('scores', res);
 
         for (const client of res) {
-            console.log('hello client',client);
+            // console.log('hello client',client);
             socket.to(client.id).emit("finalPlayerInfo", client);
         };
 

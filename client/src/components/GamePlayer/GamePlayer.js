@@ -24,6 +24,8 @@ const GamePlayer = ({ location }) => {
     const [currentOptions, setCurrentOptions] = useState([]);
     const [currentRound, setCurrentRound] = useState(0);
 
+    const [playersInRoom, setPlayersInRoom] = useState([]);
+
     const [clickActivated, setClickActivated] = useState(true); // used to prevent many clicks on one option
 
     // game end
@@ -40,7 +42,6 @@ const GamePlayer = ({ location }) => {
         console.log('room:', joinRoomName, 'name:', playerName);
     
         socket.emit('joinRoom', { joinRoomName, playerName }, (error) => {
-            console.log(`****** WELCOME to room: ${joinRoomName}, ${playerName} with id: ${socket.id}`);
             if (error) {
                 setError(true);
                 setErrorMsg(error);
@@ -48,6 +49,12 @@ const GamePlayer = ({ location }) => {
             };
         });
         
+        socket.on('playerData', (allPlayersInRoom) => {
+            console.log(allPlayersInRoom);
+            setPlayersInRoom(allPlayersInRoom);
+            console.log('all players in room:', playersInRoom); // is empty the first time, but it is set the next time
+        });
+
         return () => {
             socket.emit('disconnect');
             socket.disconnect();
@@ -104,9 +111,7 @@ const GamePlayer = ({ location }) => {
             console.log(client);
             setPlayer(client);
         });
-
     }, []);
-
 
 
     return(
@@ -121,6 +126,14 @@ const GamePlayer = ({ location }) => {
                 { gameStart === false ? (
                     <div>
                         <h1>Game player</h1>
+                        <a href="/">Leave room</a>
+                        {playersInRoom.map((playerInfo, index) => 
+                            <p key={index}>
+                                {playerInfo.username}
+                                {playerInfo.score}
+                            </p>
+                        )}
+
                         <h3>Waiting for master to start the game...</h3>
                         <Messages messages={messages} />
                     </div>
