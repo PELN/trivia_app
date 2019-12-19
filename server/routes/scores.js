@@ -9,13 +9,15 @@ const Score = require('../models/Score');
 router.get('/', (req, res) => {
     Score.find()
         .sort({score: -1}) // sort by highest score, desc
+        .limit(20)
         .then(scores => res.json(scores));
 });
 
 
 // POST api/score
-router.post('/post', (req, res) => {
+router.post('/save', (req, res) => {
     console.log("REQ BODY_____", req.body);
+    
     const newScore = new Score({
         username: req.body.username,
         score: req.body.score

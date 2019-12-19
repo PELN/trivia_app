@@ -2,6 +2,7 @@ const express = require('express');
 const socketio = require('socket.io');
 const http = require('http');
 const PORT = 5000;
+const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
@@ -11,9 +12,11 @@ const io = socketio(server, {
     cookie: false
 });
 
+app.use(cors());
 app.use(express.json()); // to be able to get the req.body, res.body as json
 const scores = require('./routes/scores');
 app.use('/scores', scores);
+
 
 // MONGO 
 const mongoose = require('mongoose');
