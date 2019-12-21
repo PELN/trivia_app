@@ -26,6 +26,8 @@ const GameMaster = ({ location }) => {
     const [error, setError] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     
+    const [playersInRoom, setPlayersInRoom] = useState([]);
+
     useEffect(() => {
         const { roomName, masterName } = queryString.parse(location.search);
         socket = io.connect(server);
@@ -49,6 +51,14 @@ const GameMaster = ({ location }) => {
         };
 
     }, [server, location.search]);
+
+    useEffect(() => {
+        socket.on('playerData', (allPlayersInRoom) => {
+            console.log(allPlayersInRoom);
+            setPlayersInRoom(allPlayersInRoom);
+            console.log('all players in room:', playersInRoom); // is empty the first time, but it is set the next time
+        });
+    },[]);
 
     useEffect(() => {
         socket.on('message', (text) => {
@@ -149,6 +159,13 @@ const GameMaster = ({ location }) => {
                 <div>
                     <h1>Game master</h1>
                     {serverRes.res}
+                    <a href="/">Leave room</a>
+                    {playersInRoom.map((playerInfo, index) => 
+                        <p key={index}>
+                            {playerInfo.username}
+                            {playerInfo.score}
+                        </p>
+                    )}
                     <Messages messages={messages} />
                     <button onClick={InitGame}>Init Game</button>
                     {/* if game has ended (length of questions = 5), change button to 'next' instead of 'start' */}

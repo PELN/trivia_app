@@ -161,17 +161,36 @@ io.on('connect', (socket) => {
     });
     
     socket.on('disconnect', () => {
-        // console.log('user left with socket id', socket.id);
-        console.log(rooms[socket.roomName].players[socket.username].username, 'has left');
-        socket.broadcast.to(socket.roomId).emit('message', { text: `${rooms[socket.roomName].players[socket.username].username} has left the game!` });
+        console.log('user left with socket id', socket.id);
+        // console.log(rooms[socket.roomName].sockets[0].id);
+        // if room has been deleted when master leaving the game
+        if(typeof rooms[socket.roomName] == "undefined") {
+            console.log('room does not exist');
+        } else {
+            // if room exists
+            if(rooms[socket.roomName].sockets[0].id !== socket.id){
+                console.log(rooms[socket.roomName].players[socket.username].username, 'has left');
+                socket.broadcast.to(socket.roomId).emit('message', { text: `${rooms[socket.roomName].players[socket.username].username} has left the game!` });
+        
+                res = Object.values(rooms[socket.roomName].players);
+                delete rooms[socket.roomName].players[socket.username];
+        
+                const room = rooms[socket.roomName];
+                allPlayersInRoom = Object.values(room.players);
+                io.to(room.id).emit('playerData', allPlayersInRoom);
+            } else {
+                // send msg to players that master left
+                console.log(rooms[socket.roomName].sockets[0].username, 'has left');
+                socket.broadcast.to(socket.roomId).emit('message', { text: `The gamemaster ${rooms[socket.roomName].sockets[0].username} has left the game! Please leave the room.` });
+    
+                const room = rooms[socket.roomName];
+                // remove room from rooms
+                delete rooms[room.name];
+                console.log(rooms);
+            }
+        }
 
-        res = Object.values(rooms[socket.roomName].players);
-        console.log('disconnect: res before splice', res);
-        delete rooms[socket.roomName].players[socket.username];
 
-        const room = rooms[socket.roomName];
-        allPlayersInRoom = Object.values(room.players);
-        io.to(room.id).emit('playerData', allPlayersInRoom);
     });
 });
 
