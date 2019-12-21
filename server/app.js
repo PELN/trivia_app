@@ -158,16 +158,20 @@ io.on('connect', (socket) => {
             // console.log('hello client',client);
             socket.to(client.id).emit("finalPlayerInfo", client);
         };
-
     });
     
     socket.on('disconnect', () => {
-        // console.log('user left');
-        // console.log(socket.id);
+        // console.log('user left with socket id', socket.id);
+        console.log(rooms[socket.roomName].players[socket.username].username, 'has left');
+        socket.broadcast.to(socket.roomId).emit('message', { text: `${rooms[socket.roomName].players[socket.username].username} has left the game!` });
 
-        // const room = rooms[socket.roomName];
-        // io.to(room.id).emit('message', { text: `${playerName} has left.` });
-        // console.log(`${playerName} has left`);
+        res = Object.values(rooms[socket.roomName].players);
+        console.log('disconnect: res before splice', res);
+        delete rooms[socket.roomName].players[socket.username];
+
+        const room = rooms[socket.roomName];
+        allPlayersInRoom = Object.values(room.players);
+        io.to(room.id).emit('playerData', allPlayersInRoom);
     });
 });
 
