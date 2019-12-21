@@ -51,8 +51,7 @@ const EndGame = ({ players, player }) => {
                 <input disabled={true} readOnly defaultValue={player.score}/>
                 <button>Save score</button>
             </form>
-
-            {/* <Leaderboard/> */}
+            <a href="/">Leave room</a>
         </div>
     );
 }

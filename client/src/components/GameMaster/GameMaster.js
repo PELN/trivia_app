@@ -106,7 +106,7 @@ const GameMaster = ({ location }) => {
     useEffect(() => {
         socket.on('initGame', () => {
             setRound(0); // init game to 0
-            const response = fetch("https://opentdb.com/api.php?amount=1&type=multiple&encode=url3986")
+            const response = fetch("https://opentdb.com/api.php?amount=3&type=multiple&encode=url3986")
                 .then(response => response.json())
                 .then(res => {
                     console.log("This is res and round",res, round);
