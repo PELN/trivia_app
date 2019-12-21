@@ -17,14 +17,12 @@ app.use(express.json()); // to be able to get the req.body, res.body as json
 const scores = require('./routes/scores');
 app.use('/scores', scores);
 
-
 // MONGO 
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/trivia', {
     useNewUrlParser: true, 
     useUnifiedTopology: true
 }, console.log('COONNECTED TO MONGO'));
-
 
 // SOCKET
 const uuidv1 = require('uuid/v1');
@@ -186,7 +184,6 @@ io.on('connect', (socket) => {
         };
     });
 });
-
 
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

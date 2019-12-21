@@ -13,9 +13,8 @@ const Leaderboard = () => {
         })
         .then(response => response.json())
         .then( (scores) => {
-            // console.log(scores);
             setLeaderboard(scores);
-            console.log(leaderboard);
+            // console.log(leaderboard);
         });
 
     }, []);

@@ -3,18 +3,18 @@ import './GameQuestion.css';
 
 const GameQuestion = ({ currentQuestion, currentOptions, currentRound, playerName, socket, clickStatus, onClickChange }) => {
     const [playerChoice, setPlayerChoice] = useState('');
-    const [clickActivated, setClickActivated] = useState(clickStatus); // used to prevent many clicks on one option ^ also onClickChange
+    const [clickActivated, setClickActivated] = useState(clickStatus); // clickStatus is by default set to true from GamePlayer, to show the question first
 
     const clickOption = (event) => {
         const choice = event.target.innerText;
-        // console.log('clicked on choice', choice);
         socket.emit('playerChoice', { playerName, choice, currentRound }, () => {
             console.log('player name', playerName, 'choice', playerChoice);
         });
         setPlayerChoice(choice);
 
-        setClickActivated(false); // used to prevent many clicks on one option
-        onClickChange(false); // used to prevent many clicks on one option
+        // when player has clicked on a choice the click is set to false, to show what choice they have chosen
+        setClickActivated(false); 
+        onClickChange(false); // set handleClickChange parameter to false in GamePlayer
     };
     
     return(

@@ -26,7 +26,7 @@ const GamePlayer = ({ location }) => {
 
     const [playersInRoom, setPlayersInRoom] = useState([]);
 
-    const [clickActivated, setClickActivated] = useState(true); // used to prevent many clicks on one option
+    const [clickActivated, setClickActivated] = useState(true);
 
     // game end
     const [players, setPlayers] = useState([]); // to get final score
@@ -59,17 +59,12 @@ const GamePlayer = ({ location }) => {
             socket.emit('disconnect');
             socket.disconnect();
         };
-
     }, [server, location.search]);
 
     useEffect(() => {
         socket.on('message', (text) => {
             setMessage(text);
         });
-    }, []);
-
-
-    useEffect(() => {
         socket.on('message', (message) => {
             setMessages([...messages, message ]); // use spread operator to send whole array + add the message to it
         });
@@ -78,30 +73,27 @@ const GamePlayer = ({ location }) => {
 
     useEffect(() => {
         socket.on('currentRound', (currentQuestion, currentOptions, currentRound) => {
-            console.log(currentQuestion);
-            console.log(currentOptions);
-            console.log(currentRound);
-
+            // console.log(currentQuestion, currentOptions, currentRound);
             setCurrentQuestion(currentQuestion);
             setCurrentOptions(currentOptions);
             setCurrentRound(currentRound);
-            console.log("This is the clicky status:", clickActivated);
+            
             setGameStart(true);
             setGameEnd(false);
-            setClickActivated(true); // used to prevent many clicks on one option
+            console.log("This is the clicky status:", clickActivated);
+            setClickActivated(true); // set click status to true on each round, to show question in GameQuestion
         });
     },[currentQuestion]);
 
-    
-    // used to prevent many clicks on one option
+    // set value to false from click function in GameQuestion (onClickChange)
     const handleClickChange = (val) => {
         console.log("This is the value of clicky", val);
-        setClickActivated(val);
-    }
+        setClickActivated(val); // set value from GameQuestion
+    };
 
+    // get all players score - pass it to EndGame
     useEffect(() => {
         socket.on('scores', (players) => {
-            // console.log('scores in gameplayer', players);
             setPlayers(players);
             setGameEnd(true);
         });
@@ -127,10 +119,10 @@ const GamePlayer = ({ location }) => {
                     <div>
                         <h1>Game player</h1>
                         <a href="/">Leave room</a>
+                        <h3>Players in room</h3>
                         {playersInRoom.map((playerInfo, index) => 
                             <p key={index}>
                                 {playerInfo.username}
-                                {playerInfo.score}
                             </p>
                         )}
 

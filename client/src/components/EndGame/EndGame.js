@@ -1,11 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useHistory } from "react-router-dom";
-// import Leaderboard from '../../components/Leaderboard/Leaderboard';
 
 const EndGame = ({ players, player }) => {
-    // console.log('scores in end game:', players);
-    // console.log('hello client', player);
-    // const [responseToPost, setResponseToPost] = useState('');
     let history = useHistory();
 
     const handleSubmit = async e => {
@@ -24,7 +20,6 @@ const EndGame = ({ players, player }) => {
         }).then((response) => {
             if(response.status === 200) {
                 console.log('Score has been saved');
-                // setResponseToPost({responseToPost: {type:'success', message: 'Your score has been saved'}});
                 history.push('/leaderboard');
             };
         });
@@ -34,8 +29,6 @@ const EndGame = ({ players, player }) => {
     return(
         <div>
             <h1>Game has ended</h1>
-            {/* <p className={responseToPost.type}>{responseToPost.message}</p> */}
-
             {players.map((player, index) =>
                 <div className="score-container" key={index}>
                     <div>
