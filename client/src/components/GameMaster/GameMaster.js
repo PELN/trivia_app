@@ -49,7 +49,6 @@ const GameMaster = ({ location }) => {
             socket.emit('disconnect');
             socket.disconnect();
         };
-
     }, [server, location.search]);
 
     useEffect(() => {
@@ -62,47 +61,25 @@ const GameMaster = ({ location }) => {
         });
     }, [messages]); // when messages array changes rerender effect
 
-    // click init game btn and check if there are enough players
     const InitGame = () => {
         socket.emit('ready', (res) => {
             setServerRes(res);
-            console.log(res); // game is either initialized or there are not enough players
+            console.log(res);
         });
     };
     
-    useEffect(() => {
-        socket.on('initGame', () => {
-            setRound(0); // init game round to 0
-            fetch("https://opentdb.com/api.php?amount=3&type=multiple&encode=url3986")
-                .then(response => response.json())
-                .then(res => {
-                    console.log("This is res and round",res, round);
-                    setQuestions(res.results);
-                    getQuestion(res.results);
-            });
-        });
-    }, []);
-
-    const getQuestion = (questionObj) => {
-        setCurrentQuestion(questionObj[round].question);
-        const options = questionObj[round].incorrect_answers;
-        const correctOption = questionObj[round].correct_answer;
-        setCurrentOptions([...options, correctOption]); //correctAnswer has to have random position
-        setCorrectAnswer(correctOption);
-        setRound(prevRound => {return prevRound + 1}); // function that increments the round
-    };
-
     const ShowQuestion = () => {
+        console.log("Current options", currentOptions);
         // send first question
-        socket.emit('showQuestion', { currentQuestion, currentOptions, round });
+        socket.emit('showQuestion', { currentQuestion, currentOptions, round }, () => {});
         console.log("round", round);
     };
     
     const NextQuestion = () => {
-        // update next round question but not if the round is equal to question length
+        // update next round question but not if the round(5) is equal to question length(5)
         // because this would request a value in the array that does not exist (Out of bounds)
         if (round !== questions.length) {
-            console.log('QUESTIONS', questions);
+            console.log(questions);
             getQuestion(questions);
         } else {
             // reached max round - end game
@@ -112,9 +89,21 @@ const GameMaster = ({ location }) => {
     };
 
     useEffect(() => {
-        // check if answer is correct, emit playername to server, if they answered correctly
+        socket.on('initGame', () => {
+            setRound(0); // init game to 0
+            const response = fetch("https://opentdb.com/api.php?amount=3&type=multiple&encode=url3986")
+                .then(response => response.json())
+                .then(res => {
+                    console.log("This is res and round",res, round);
+                    setQuestions(res.results);
+                    getQuestion(res.results);
+            });
+        });
+    }, []);
+
+    useEffect(() => {
+        // check if answer is correct for each round, emit playername to server, if they answered correctly
         socket.on('playerChoice', (playerName, playerChoice, currentRound) => {
-            console.log('**************',questions)
             // if it is not undefined
             if(typeof questions[round-1] !== 'undefined' && currentRound === round) {
                 console.log('CORRECT ANSWER IS:', decodeURIComponent(correctAnswer));           
@@ -125,11 +114,20 @@ const GameMaster = ({ location }) => {
                 } else {
                     console.log(playerName, 'has NOT answered correctly!');
                     // NO POINT
-                }
-            }
+                };
+            };
         });
     }, [round]);
 
+    // function that gets/sets the question obj
+    const getQuestion = (questionObj) => {
+        setCurrentQuestion(questionObj[round].question);
+        const options = questionObj[round].incorrect_answers;
+        const correctOption = questionObj[round].correct_answer;
+        setCurrentOptions([...options, correctOption]); // correctAnswer has to have random position
+        setCorrectAnswer(correctOption);
+        setRound(prevRound => {return prevRound + 1}); // function that increments the round
+    };
 
     return(
         <div>
@@ -151,7 +149,8 @@ const GameMaster = ({ location }) => {
                     )}
                     <Messages messages={messages} />
                     <button onClick={InitGame}>Init Game</button>
-                    <button onClick={ShowQuestion}>Show question</button>
+                    {/* if game has ended (length of questions = 5), change button to 'next' instead of 'start' */}
+                    <button onClick={ShowQuestion}>Show question</button> {/* This button used to be start game */}
                     <button onClick={NextQuestion}>Next question</button>
                 </div>
             )}
