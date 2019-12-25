@@ -158,8 +158,9 @@ io.on('connect', (socket) => {
             console.log('room does not exist, leave the room');
         } else {
             const room = rooms[socket.roomName];
-
+            console.log(room.players);
             // if room exists, delete player from players array in that room
+            // when refreshing master page, the room is deleted, so there are not any sockets in the room
             if(room.sockets[0].id !== socket.id){
                 console.log(room.players[socket.username].username, 'has left');
                 socket.broadcast.to(socket.roomId).emit('message', { text: `${room.players[socket.username].username} has left the game!` });
@@ -179,7 +180,6 @@ io.on('connect', (socket) => {
                 
                 // remove room from rooms
                 delete rooms[room.name];
-                // console.log(rooms);
             };
         };
     });

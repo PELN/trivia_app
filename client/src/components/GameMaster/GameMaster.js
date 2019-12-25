@@ -69,10 +69,9 @@ const GameMaster = ({ location }) => {
     };
     
     const ShowQuestion = () => {
-        console.log("Current options", currentOptions);
         // send first question
-        socket.emit('showQuestion', { currentQuestion, currentOptions, round }, () => {});
-        console.log("round", round);
+        socket.emit('showQuestion', { currentQuestion, currentOptions, round });
+        console.log("Current question", currentQuestion, currentOptions, round);
     };
     
     const NextQuestion = () => {
@@ -91,7 +90,7 @@ const GameMaster = ({ location }) => {
     useEffect(() => {
         socket.on('initGame', () => {
             setRound(0); // init game to 0
-            const response = fetch("https://opentdb.com/api.php?amount=3&type=multiple&encode=url3986")
+            const response = fetch("https://opentdb.com/api.php?amount=10&type=multiple&encode=url3986")
                 .then(response => response.json())
                 .then(res => {
                     console.log("This is res and round",res, round);
@@ -122,10 +121,17 @@ const GameMaster = ({ location }) => {
     // function that gets/sets the question obj
     const getQuestion = (questionObj) => {
         setCurrentQuestion(questionObj[round].question);
-        const options = questionObj[round].incorrect_answers;
+        const incorrectOptions = questionObj[round].incorrect_answers;
         const correctOption = questionObj[round].correct_answer;
-        setCurrentOptions([...options, correctOption]); // correctAnswer has to have random position
+
+        // array of options where correct option is in random position
+        const randomOptionsArray = [...incorrectOptions];
+        const position = Math.floor(Math.random() * 3) + 1; // random index between 0 and 3
+        randomOptionsArray.splice(position -1, 0, correctOption); // correct option in random position // splice returns removed items and changes original array
+        console.log('random options array', randomOptionsArray);
         setCorrectAnswer(correctOption);
+        setCurrentOptions(randomOptionsArray);
+
         setRound(prevRound => {return prevRound + 1}); // function that increments the round
     };
 
@@ -147,10 +153,9 @@ const GameMaster = ({ location }) => {
                             {playerInfo.username}
                         </p>
                     )}
-                    <Messages messages={messages} />
+                    <Messages messages={messages}/>
                     <button onClick={InitGame}>Init Game</button>
-                    {/* if game has ended (length of questions = 5), change button to 'next' instead of 'start' */}
-                    <button onClick={ShowQuestion}>Show question</button> {/* This button used to be start game */}
+                    <button onClick={ShowQuestion}>Show question</button>
                     <button onClick={NextQuestion}>Next question</button>
                 </div>
             )}
