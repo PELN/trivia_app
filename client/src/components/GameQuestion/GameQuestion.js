@@ -17,7 +17,7 @@ const GameQuestion = ({ currentQuestion, currentOptions, currentRound, playerNam
         onClickChange(false); // set handleClickChange parameter to false in GamePlayer
     };
     
-    return(
+    return (
         <div>
             <div className="round-container">
                 <h2>Question {currentRound}</h2>

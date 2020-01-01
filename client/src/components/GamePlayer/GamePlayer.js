@@ -108,7 +108,7 @@ const GamePlayer = ({ location }) => {
         });
     }, []);
 
-    return(
+    return (
         <Container>
             <div className="wrapper">
                 {error === true ? (

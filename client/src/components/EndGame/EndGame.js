@@ -1,6 +1,6 @@
 import React from 'react';
 import { useHistory } from "react-router-dom";
-import { Form, Container, Col, Button, Table } from 'react-bootstrap';
+import { Form, Container, Button, Table } from 'react-bootstrap';
 import './EndGame.css';
 
 const EndGame = ({ players, player }) => {
@@ -27,41 +27,42 @@ const EndGame = ({ players, player }) => {
         });
     };
 
-
     return(
-        <div>
-            <h2>The game has ended!</h2>
-            <div className="score-container">
-            <h3>Game scores</h3>
-                <Table striped bordered hover>
-                    <thead>
-                        <tr>
-                            <th>Player name</th>
-                            <th>Score</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {players.map((player, index) =>
-                            <tr key={index}>
-                                <td>{player.username}</td>
-                                <td>{player.score}</td>
+        <Container>
+            <div>
+                <h2>The game has ended!</h2>
+                <div className="score-container">
+                <h3>Game scores</h3>
+                    <Table striped bordered hover>
+                        <thead>
+                            <tr>
+                                <th>Player name</th>
+                                <th>Score</th>
                             </tr>
-                        )}
-                    </tbody>
-                </Table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {players.map((player, index) =>
+                                <tr key={index}>
+                                    <td>{player.username}</td>
+                                    <td>{player.score}</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </Table>
+                </div>
 
-            <div className="save-score-container">
-                <h3>Save score to leaderboard</h3>
-                <p>If you want to play again in the same room, don't save your score!</p>
-                <Form onSubmit={handleSubmit} method="POST">
-                    <input disabled={true} readOnly defaultValue={player.username} className="form-control"/>
-                    <input disabled={true} readOnly defaultValue={player.score} className="form-control"/>
-                    <Button variant="primary" type="submit">Save score</Button>
-                </Form>
+                <div className="save-score-container">
+                    <h3>Save score to leaderboard</h3>
+                    <p>If you want to play again in the same room, don't save your score!</p>
+                    <Form onSubmit={handleSubmit} method="POST">
+                        <input disabled={true} readOnly defaultValue={player.username} className="form-control"/>
+                        <input disabled={true} readOnly defaultValue={player.score} className="form-control"/>
+                        <Button variant="primary" type="submit">Save score</Button>
+                    </Form>
+                </div>
+                <a href="/">Leave room</a>
             </div>
-            <a href="/">Leave room</a>
-        </div>
+        </Container>
     );
 };
 
