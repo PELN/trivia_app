@@ -97,7 +97,7 @@ const GameMaster = ({ location }) => {
             const response = fetch("https://opentdb.com/api.php?amount=3&type=multiple&encode=url3986")
                 .then(response => response.json())
                 .then(res => {
-                    console.log("This is res and round",res, round);
+                    console.log("This is res and round", res, round);
                     setQuestions(res.results);
                     getQuestion(res.results);
             });
@@ -133,10 +133,10 @@ const GameMaster = ({ location }) => {
         const randomOptionsArray = [...incorrectOptions];
         const position = Math.floor(Math.random() * 3) + 1; // random index between 0 and 3
         randomOptionsArray.splice(position -1, 0, correctOption); // correct option in random position // splice returns removed items and changes original array
-        console.log('random options array', randomOptionsArray);
         setCorrectAnswer(correctOption);
         setCurrentOptions(randomOptionsArray);
-
+        
+        console.log('Current round: ', round);
         setRound(prevRound => {return prevRound + 1}); // function that increments the round
     };
 

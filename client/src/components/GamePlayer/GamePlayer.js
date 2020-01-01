@@ -108,7 +108,6 @@ const GamePlayer = ({ location }) => {
         });
     }, []);
 
-
     return(
         <Container>
             <div className="wrapper">
@@ -143,15 +142,15 @@ const GamePlayer = ({ location }) => {
                         // if game has ended - show endgame component instead of game question
                         <div>
                             { gameEnd === false ? (
-                                    <GameQuestion 
-                                        currentQuestion={currentQuestion} 
-                                        currentOptions={currentOptions} 
-                                        currentRound={currentRound} 
-                                        playerName={playerName} 
-                                        socket={socket} 
-                                        clickStatus={clickActivated} 
-                                        onClickChange={handleClickChange}
-                                    />
+                                <GameQuestion
+                                    currentQuestion={currentQuestion} 
+                                    currentOptions={currentOptions} 
+                                    currentRound={currentRound} 
+                                    playerName={playerName} 
+                                    socket={socket} 
+                                    clickStatus={clickActivated} 
+                                    onClickChange={handleClickChange}
+                                />
                             ) : (
                                 <EndGame players={players} player={player} />
                                 )

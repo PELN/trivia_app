@@ -30,7 +30,7 @@ const EndGame = ({ players, player }) => {
 
     return(
         <div>
-            <h1>The game has ended!</h1>
+            <h2>The game has ended!</h2>
             <div className="score-container">
             <h3>Game scores</h3>
                 <Table striped bordered hover>
@@ -55,8 +55,8 @@ const EndGame = ({ players, player }) => {
                 <h3>Save score to leaderboard</h3>
                 <p>If you want to play again in the same room, don't save your score!</p>
                 <Form onSubmit={handleSubmit} method="POST">
-                    <Form.Control disabled={true} readOnly defaultValue={player.username}/>
-                    <Form.Control disabled={true} readOnly defaultValue={player.score}/>
+                    <input disabled={true} readOnly defaultValue={player.username} className="form-control"/>
+                    <input disabled={true} readOnly defaultValue={player.score} className="form-control"/>
                     <Button variant="primary" type="submit">Save score</Button>
                 </Form>
             </div>
