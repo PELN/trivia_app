@@ -33,21 +33,20 @@ const EndGame = ({ players, player }) => {
             <h1>The game has ended!</h1>
             <div className="score-container">
             <h3>Game scores</h3>
-
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>Player name</th>
-                        <th>Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {players.map((player, index) =>
-                        <tr key={index}>
-                            <td>{player.username}</td>
-                            <td>{player.score}</td>
+                <Table striped bordered hover>
+                    <thead>
+                        <tr>
+                            <th>Player name</th>
+                            <th>Score</th>
                         </tr>
-                    )}
+                    </thead>
+                    <tbody>
+                        {players.map((player, index) =>
+                            <tr key={index}>
+                                <td>{player.username}</td>
+                                <td>{player.score}</td>
+                            </tr>
+                        )}
                     </tbody>
                 </Table>
             </div>
@@ -64,8 +63,6 @@ const EndGame = ({ players, player }) => {
             <a href="/">Leave room</a>
         </div>
     );
-}
-
+};
 
 export default EndGame;
-

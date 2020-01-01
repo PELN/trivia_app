@@ -1,6 +1,5 @@
 import React, { useState, useEffect} from 'react';
 import { Container, Table } from 'react-bootstrap';
-import './LeaderBoard.css';
 
 const Leaderboard = () => {
     const [leaderboard, setLeaderboard] = useState([]);

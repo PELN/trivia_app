@@ -122,16 +122,19 @@ const GamePlayer = ({ location }) => {
                     { gameStart === false ? (
                         <div>
                             <h2>Hello, Game player {playerName}!</h2>
+                            <p><strong>Waiting for game master to start the game...</strong></p>
                             <div className="players-container">
-                                <h3 className="h3-players">Players in room</h3>
+                                <h3>Players in room</h3>
+                                <hr/>
                                 {playersInRoom.map((playerInfo, index) => 
-                                    <p key={index}>
-                                        {playerInfo.username}
+                                    <p className="p-players" key={index}>
+                                        Playername: {playerInfo.username}
                                     </p>
                                 )}
                             </div>
                             <div className="messages-container">
-                                <h3>Waiting for master to start the game...</h3>
+                                <h3>Activity</h3>
+                                <hr/>
                                 <Messages messages={messages} />
                             </div>
                             <a href="/">Leave room</a>
@@ -141,13 +144,13 @@ const GamePlayer = ({ location }) => {
                         <div>
                             { gameEnd === false ? (
                                     <GameQuestion 
-                                    currentQuestion={currentQuestion} 
-                                    currentOptions={currentOptions} 
-                                    currentRound={currentRound} 
-                                    playerName={playerName} 
-                                    socket={socket} 
-                                    clickStatus={clickActivated} 
-                                    onClickChange={handleClickChange}
+                                        currentQuestion={currentQuestion} 
+                                        currentOptions={currentOptions} 
+                                        currentRound={currentRound} 
+                                        playerName={playerName} 
+                                        socket={socket} 
+                                        clickStatus={clickActivated} 
+                                        onClickChange={handleClickChange}
                                     />
                             ) : (
                                 <EndGame players={players} player={player} />

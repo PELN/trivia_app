@@ -28,7 +28,6 @@ const GameMaster = ({ location }) => {
     
     const [playersInRoom, setPlayersInRoom] = useState([]);
 
-
     useEffect(() => {
         const { roomName, masterName } = queryString.parse(location.search);
         socket = io.connect(server);
@@ -159,15 +158,17 @@ const GameMaster = ({ location }) => {
                             <Button variant="primary" size="md" onClick={NextQuestion}>Next question</Button>
                         </div>
                         <div className="players-container">
-                            <h3 className="h3-players">Players in room</h3>
+                            <h3>Players in room</h3>
+                            <hr/>
                             {playersInRoom.map((playerInfo, index) => 
-                                <p key={index}>
+                                <p className="p-players" key={index}>
                                     Playername: {playerInfo.username}
                                 </p>
                             )}
                         </div>
                         <div className="messages-container">
                             <h3>Activity</h3>
+                            <hr/>
                             <Messages messages={messages}/>
                         </div>
                         <a href="/">Leave room</a>
