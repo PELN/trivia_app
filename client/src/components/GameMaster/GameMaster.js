@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
 import queryString from 'query-string';
+import React, { useEffect, useState } from 'react';
+import { Button, Container } from 'react-bootstrap';
 import io from 'socket.io-client';
 import Messages from '../Messages/Messages';
+import './GameMaster.css';
 
 let socket;
 
@@ -10,7 +12,7 @@ const GameMaster = ({ location }) => {
     const [roomName, setRoomName] = useState('');
     const [masterName, setMasterName] = useState('');
     
-    const [serverRes, setServerRes] = useState('');
+    const [serverResMsg, setServerResMsg] = useState({res: 'When at least 2 players are in the room, click Init Game'});
 
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
@@ -25,6 +27,7 @@ const GameMaster = ({ location }) => {
     const [errorMsg, setErrorMsg] = useState('');
     
     const [playersInRoom, setPlayersInRoom] = useState([]);
+
 
     useEffect(() => {
         const { roomName, masterName } = queryString.parse(location.search);
@@ -63,7 +66,7 @@ const GameMaster = ({ location }) => {
 
     const InitGame = () => {
         socket.emit('ready', (res) => {
-            setServerRes(res);
+            setServerResMsg(res);
             console.log(res);
         });
     };
@@ -72,6 +75,7 @@ const GameMaster = ({ location }) => {
         // send first question
         socket.emit('showQuestion', { currentQuestion, currentOptions, round });
         console.log("Current question", currentQuestion, currentOptions, round);
+        setServerResMsg({res:'Question is now being showed to players'});
     };
     
     const NextQuestion = () => {
@@ -84,13 +88,14 @@ const GameMaster = ({ location }) => {
             // reached max round - end game
             console.log('game has ended');
             socket.emit('endGame');
+            setServerResMsg({res: 'Game has ended! If you want to play again, click Init Game'});
         };
     };
 
     useEffect(() => {
         socket.on('initGame', () => {
             setRound(0); // init game to 0
-            const response = fetch("https://opentdb.com/api.php?amount=10&type=multiple&encode=url3986")
+            const response = fetch("https://opentdb.com/api.php?amount=3&type=multiple&encode=url3986")
                 .then(response => response.json())
                 .then(res => {
                     console.log("This is res and round",res, round);
@@ -107,14 +112,15 @@ const GameMaster = ({ location }) => {
             if(typeof questions[round-1] !== 'undefined' && currentRound === round) {
                 console.log('CORRECT ANSWER IS:', decodeURIComponent(correctAnswer));           
                 if (playerChoice === decodeURIComponent(correctAnswer)) {
-                    console.log(playerName, 'has answered correctly!');
+                    console.log(playerName, 'has answered correctly!');    
                     // GIVE POINT
-                    socket.emit('updateScore', playerName );
+                    socket.emit('updateScore', playerName);
                 } else {
                     console.log(playerName, 'has NOT answered correctly!');
                     // NO POINT
                 };
             };
+            setServerResMsg({res: 'When all players has answered, click Next question, then click Show question'});
         });
     }, [round]);
 
@@ -135,31 +141,40 @@ const GameMaster = ({ location }) => {
         setRound(prevRound => {return prevRound + 1}); // function that increments the round
     };
 
-    return(
-        <div>
-            {error === true ? (
-                <div>
-                    {errorMsg.error}
-                    <a href="/">Go back</a>
-                </div>
-            ) : (
-                <div>
-                    <h1>Game master</h1>
-                    {serverRes.res}
-                    <a href="/">Leave room</a>
-                    <h3>Players in room</h3>
-                    {playersInRoom.map((playerInfo, index) => 
-                        <p key={index}>
-                            {playerInfo.username}
-                        </p>
-                    )}
-                    <Messages messages={messages}/>
-                    <button onClick={InitGame}>Init Game</button>
-                    <button onClick={ShowQuestion}>Show question</button>
-                    <button onClick={NextQuestion}>Next question</button>
-                </div>
-            )}
-        </div>
+    return (
+        <Container>
+            <div className="wrapper">
+                {error === true ? (
+                    <div className="errorMsg">
+                        <p>{errorMsg.error}</p>
+                        <a href="/">Go back</a>
+                    </div>
+                ) : (
+                    <div>
+                        <h2>Hello, Game Master {masterName}!</h2>
+                        <div className="serverRes"><strong>{serverResMsg.res}</strong></div>
+                        <div className="button-container">
+                            <Button variant="primary" size="md" onClick={InitGame}>Init Game</Button>
+                            <Button variant="primary" size="md" onClick={ShowQuestion}>Show question</Button>
+                            <Button variant="primary" size="md" onClick={NextQuestion}>Next question</Button>
+                        </div>
+                        <div className="players-container">
+                            <h3 className="h3-players">Players in room</h3>
+                            {playersInRoom.map((playerInfo, index) => 
+                                <p key={index}>
+                                    Playername: {playerInfo.username}
+                                </p>
+                            )}
+                        </div>
+                        <div className="messages-container">
+                            <h3>Activity</h3>
+                            <Messages messages={messages}/>
+                        </div>
+                        <a href="/">Leave room</a>
+                    </div>
+                )}
+            </div>
+        </Container>
     );
 };
 

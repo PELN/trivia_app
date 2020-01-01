@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css?family=Josefin+Sans');
+
+body {
+    background: #3C41A6;
+}
+
+main {
+    background: #3C41A6;
+    height: 100vh;
+}
+
+.btn-primary {
+    background-color: #54C899!important;
+    border-color: #54C899!important;
+    border-radius: 50px!important;
+}
+
+.container {
+    padding: 2rem 1.5rem;
+}
+
+a {
+    color:#54C899!important;
+}
+
+h2 {
+    font-size: 27px;
+    font-weight: 700;
+}
+
+h3 {
+    font-size: 23px;
+}

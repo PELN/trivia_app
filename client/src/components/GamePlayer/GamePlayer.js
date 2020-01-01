@@ -6,6 +6,9 @@ import Messages from '../Messages/Messages';
 import GameQuestion from '../GameQuestion/GameQuestion';
 import EndGame from '../EndGame/EndGame';
 
+import { Container } from 'react-bootstrap';
+import './GamePlayer.css';
+
 let socket;
 
 const GamePlayer = ({ location }) => {
@@ -107,52 +110,57 @@ const GamePlayer = ({ location }) => {
 
 
     return(
-        <div>
-            {error === true ? (
-                <div>
-                    {errorMsg.error}
-                    <a href="/">Go back</a>
-                </div>
-            ) : (
-                <div>
-                { gameStart === false ? (
-                    <div>
-                        <h1>Game player</h1>
-                        <a href="/">Leave room</a>
-                        <h3>Players in room</h3>
-                        {playersInRoom.map((playerInfo, index) => 
-                            <p key={index}>
-                                {playerInfo.username}
-                            </p>
-                        )}
-
-                        <h3>Waiting for master to start the game...</h3>
-                        <Messages messages={messages} />
+        <Container>
+            <div className="wrapper">
+                {error === true ? (
+                    <div className="errorMsg">
+                        <p>{errorMsg.error}</p>
+                        <a href="/">Go back</a>
                     </div>
                 ) : (
-                    // if game has ended - show endgame component instead of game question
                     <div>
-                        { gameEnd === false ? (
-                                <GameQuestion 
-                                currentQuestion={currentQuestion} 
-                                currentOptions={currentOptions} 
-                                currentRound={currentRound} 
-                                playerName={playerName} 
-                                socket={socket} 
-                                clickStatus={clickActivated} 
-                                onClickChange={handleClickChange}
-                                />
-                        ) : (
-                            <EndGame players={players} player={player} />
-                            )
-                        }
+                    { gameStart === false ? (
+                        <div>
+                            <h2>Hello, Game player {playerName}!</h2>
+                            <div className="players-container">
+                                <h3 className="h3-players">Players in room</h3>
+                                {playersInRoom.map((playerInfo, index) => 
+                                    <p key={index}>
+                                        {playerInfo.username}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="messages-container">
+                                <h3>Waiting for master to start the game...</h3>
+                                <Messages messages={messages} />
+                            </div>
+                            <a href="/">Leave room</a>
+                        </div>
+                    ) : (
+                        // if game has ended - show endgame component instead of game question
+                        <div>
+                            { gameEnd === false ? (
+                                    <GameQuestion 
+                                    currentQuestion={currentQuestion} 
+                                    currentOptions={currentOptions} 
+                                    currentRound={currentRound} 
+                                    playerName={playerName} 
+                                    socket={socket} 
+                                    clickStatus={clickActivated} 
+                                    onClickChange={handleClickChange}
+                                    />
+                            ) : (
+                                <EndGame players={players} player={player} />
+                                )
+                            }
+                        </div>
+                        )
+                    }
                     </div>
-                    )
+                )
                 }
-                </div>
-            )
-            }
-        </div>
+            </div>
+        </Container>
     );
 };
 

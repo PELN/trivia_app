@@ -19,20 +19,26 @@ const GameQuestion = ({ currentQuestion, currentOptions, currentRound, playerNam
     
     return(
         <div>
-            <h1>Round {currentRound}</h1>
+            <div className="round-container">
+                <h2>Question {currentRound}</h2>
+            </div>
             { clickStatus === true ? (
                 <div className="container">
-                <h2>Question: {decodeURIComponent(currentQuestion.question)}</h2>
-                    {currentOptions.map((option, index) =>
-                        <div className="options-container" key={index} onClick={clickOption}>
-                            {decodeURIComponent(option)}
-                        </div>
-                        )
-                    }
+                    <div className="question-container">
+                        <h2>{decodeURIComponent(currentQuestion.question)}</h2>
+                    </div>
+                    <div className="options-container">
+                        {currentOptions.map((option, index) =>
+                            <div className="option" key={index} onClick={clickOption}>
+                                {decodeURIComponent(option)}
+                            </div>
+                            )
+                        }
+                    </div>
                 </div>
             ) : (
                 <div>
-                    <h3>You have chosen: {playerChoice}</h3>
+                    <h3 className="h3-chosen-option">You chose: {playerChoice}</h3>
                 </div>
                 )
             }

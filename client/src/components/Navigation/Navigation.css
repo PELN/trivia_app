@@ -1,0 +1,15 @@
+.navBar-header {
+    width: 100%;
+    /* background-color: rgb(46, 157, 104); */
+    background: linear-gradient(90deg, #f09819 0%, #edde5d 100%);
+    /* background: #F2C438; */
+}
+.navBar-items{
+    padding: 6px;
+    display: flex;
+    justify-content: center;
+}
+
+.logo {
+    width: 75px;
+}

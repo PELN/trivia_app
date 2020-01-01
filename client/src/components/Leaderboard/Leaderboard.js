@@ -1,4 +1,6 @@
 import React, { useState, useEffect} from 'react';
+import { Container, Table } from 'react-bootstrap';
+import './LeaderBoard.css';
 
 const Leaderboard = () => {
     const [leaderboard, setLeaderboard] = useState([]);
@@ -20,17 +22,29 @@ const Leaderboard = () => {
     }, []);
     
     return (
-        <div>
-            <h1>LEADERBOARD</h1>
-            <h3>Top 20</h3>
-            {leaderboard.map((score, index) => 
-                <div className="leaderboard-container" key={index}>
-                    {score.username}
-                    {score.score}
-                </div>
-            )}
-            <a href="/">Join a new game</a>
-        </div>
+        <Container>
+            <div className="wrapper">
+                <h1>Leaderboard</h1>
+                <h3>Top 20</h3>
+                <Table striped bordered hover>
+                    <thead>
+                        <tr>
+                            <th>Player name</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {leaderboard.map((score, index) => 
+                            <tr className="leaderboard-container" key={index}>
+                                <td>{score.username}</td>
+                                <td>{score.score}</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </Table>
+                <a href="/">Join a new game</a>
+            </div>
+        </Container>
     );
 };
 

@@ -32,7 +32,7 @@ io.on('connect', (socket) => {
     console.log('new connection', socket.id);
     
     // GameMaster creates room and joins it
-    socket.on('createRoom', ({ roomName, masterName }) => {
+    socket.on('createRoom', ({ roomName, masterName }, callback) => {
         // check if room name exists before it is created
         if (rooms[roomName]) {
             console.log('ROOM NAME ALREADY EXIST');
@@ -107,7 +107,7 @@ io.on('connect', (socket) => {
             for (const client of room.sockets) {
                 client.emit('initGame');
                 console.log("Doing solid work", room.sockets.length);
-                callback({ res: "Game initialized - Click start game" });
+                callback({ res: "Game initialized - Click Show question to begin" });
             }
         } else {
             console.log('not enough users to start game');
