@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
 
 // Get Score Model
 const Score = require('../models/Score');
@@ -13,7 +12,6 @@ router.get('/', (req, res) => {
         .then(scores => res.json(scores));
 });
 
-
 // POST api/score
 router.post('/save', (req, res) => {
     console.log("REQ BODY_____", req.body);
@@ -24,7 +22,5 @@ router.post('/save', (req, res) => {
     });
     newScore.save().then(score => res.json(score));
 });
-
-
 
 module.exports = router;
