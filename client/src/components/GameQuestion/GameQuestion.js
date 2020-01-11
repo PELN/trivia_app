@@ -4,7 +4,7 @@ import './GameQuestion.css';
 const GameQuestion = ({ currentQuestion, currentOptions, currentRound, playerName, socket, clickStatus, onClickChange }) => {
     const [playerChoice, setPlayerChoice] = useState('');
     const [clickActivated, setClickActivated] = useState(clickStatus); // clickStatus is by default set to true from GamePlayer, to show the question first
-
+    
     const clickOption = (event) => {
         const choice = event.target.innerText;
         socket.emit('playerChoice', { playerName, choice, currentRound }, () => {

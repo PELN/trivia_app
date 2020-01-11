@@ -75,18 +75,17 @@ const GamePlayer = ({ location }) => {
 
 
     useEffect(() => {
-        socket.on('currentRound', (currentQuestion, currentOptions, currentRound) => {
-            // console.log(currentQuestion, currentOptions, currentRound);
-            setCurrentQuestion(currentQuestion);
-            setCurrentOptions(currentOptions);
-            setCurrentRound(currentRound);
-            
+        socket.on('currentRound', (gameQuestion, gameOptionsArray, gameRound) => {
+            console.log(gameQuestion, gameOptionsArray, gameRound);
+            setCurrentQuestion(gameQuestion);
+            setCurrentOptions(gameOptionsArray);
+            setCurrentRound(gameRound);
             setGameStart(true);
             setGameEnd(false);
             console.log("This is the clicky status:", clickActivated);
             setClickActivated(true); // set click status to true on each round, to show question in GameQuestion
         });
-    },[currentQuestion]);
+    },[]);
 
     // set value to false from click function in GameQuestion (onClickChange)
     const handleClickChange = (val) => {

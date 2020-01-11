@@ -19,7 +19,7 @@
 .option:hover {
     cursor: pointer;
     background-color: rgb(245, 163, 56);
-    color: white;
+    color: darkslategrey;
 }
 
 .question-container {

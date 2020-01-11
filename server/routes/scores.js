@@ -14,8 +14,7 @@ router.get('/', (req, res) => {
 
 // POST api/score
 router.post('/save', (req, res) => {
-    console.log("REQ BODY_____", req.body);
-    
+    console.log("*** REQ BODY ***", req.body);
     const newScore = new Score({
         username: req.body.username,
         score: req.body.score

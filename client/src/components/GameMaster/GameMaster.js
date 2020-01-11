@@ -1,5 +1,5 @@
-import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
+import queryString from 'query-string';
 import { Button, Container } from 'react-bootstrap';
 import io from 'socket.io-client';
 import Messages from '../Messages/Messages';
@@ -18,8 +18,6 @@ const GameMaster = ({ location }) => {
     const [messages, setMessages] = useState([]);
 
     const [questions, setQuestions] = useState([]);
-    const [currentQuestion, setCurrentQuestion] = useState('');
-    const [currentOptions, setCurrentOptions] = useState([]);
     const [correctAnswer, setCorrectAnswer] = useState('');
     const [round, setRound] = useState(0);
 
@@ -29,7 +27,7 @@ const GameMaster = ({ location }) => {
     const [playersInRoom, setPlayersInRoom] = useState([]);
 
     useEffect(() => {
-        const { roomName, masterName } = queryString.parse(location.search);
+        const { roomName, masterName } = queryString.parse(location.search); // parse query to object and destructure it
         socket = io.connect(server);
         setRoomName(roomName);
         setMasterName(masterName);
@@ -43,7 +41,6 @@ const GameMaster = ({ location }) => {
         });
         
         socket.on('playerData', (allPlayersInRoom) => {
-            console.log(allPlayersInRoom);
             setPlayersInRoom(allPlayersInRoom); // is empty the first time, but it is set the next time
         });
 
@@ -66,79 +63,70 @@ const GameMaster = ({ location }) => {
     const InitGame = () => {
         socket.emit('ready', (res) => {
             setServerResMsg(res);
-            console.log(res);
         });
-    };
-    
-    const ShowQuestion = () => {
-        // send first question
-        socket.emit('showQuestion', { currentQuestion, currentOptions, round });
-        console.log("Current question", currentQuestion, currentOptions, round);
-        setServerResMsg({res:'Question is now being showed to players'});
-    };
-    
-    const NextQuestion = () => {
-        // update next round question but not if the round(5) is equal to question length(5)
-        // because this would request a value in the array that does not exist (Out of bounds)
-        if (round !== questions.length) {
-            console.log(questions);
-            getQuestion(questions);
-        } else {
-            // reached max round - end game
-            console.log('game has ended');
-            socket.emit('endGame');
-            setServerResMsg({res: 'Game has ended! If you want to play again, click Init Game'});
-        };
     };
 
     useEffect(() => {
         socket.on('initGame', () => {
-            setRound(0); // init game to 0
+            setRound(0);
             const response = fetch("https://opentdb.com/api.php?amount=3&type=multiple&encode=url3986")
                 .then(response => response.json())
                 .then(res => {
-                    console.log("This is res and round", res, round);
                     setQuestions(res.results);
-                    getQuestion(res.results);
+                    sendQuestion(res.results);
             });
         });
     }, []);
 
-    useEffect(() => {
-        // check if answer is correct for each round, emit playername to server, if they answered correctly
-        socket.on('playerChoice', (playerName, playerChoice, currentRound) => {
-            // if it is not undefined
-            if(typeof questions[round-1] !== 'undefined' && currentRound === round) {
-                console.log('CORRECT ANSWER IS:', decodeURIComponent(correctAnswer));           
-                if (playerChoice === decodeURIComponent(correctAnswer)) {
-                    console.log(playerName, 'has answered correctly!');    
-                    // GIVE POINT
-                    socket.emit('updateScore', playerName);
-                } else {
-                    console.log(playerName, 'has NOT answered correctly!');
-                    // NO POINT
-                };
-            };
-            setServerResMsg({res: 'When all players has answered, click Next question, then click Show question'});
-        });
-    }, [round]);
-
-    // function that gets/sets the question obj
-    const getQuestion = (questionObj) => {
-        setCurrentQuestion(questionObj[round].question);
+    const sendQuestion = (questionObj) => {
+        const gameQuestion = questionObj[round].question;
         const incorrectOptions = questionObj[round].incorrect_answers;
         const correctOption = questionObj[round].correct_answer;
 
         // array of options where correct option is in random position
-        const randomOptionsArray = [...incorrectOptions];
-        const position = Math.floor(Math.random() * 3) + 1; // random index between 0 and 3
-        randomOptionsArray.splice(position -1, 0, correctOption); // correct option in random position // splice returns removed items and changes original array
+        const gameOptionsArray = [...incorrectOptions];
+        const randomNumber = Math.random() * 3; // get random number between 0 and 1 (multiply with 3)
+        const position = Math.floor(randomNumber) + 1; // round randomNumber down and add 1 to it
+        gameOptionsArray.splice(position -1, 0, correctOption); // splice returns removed items from array (start pos, deleteCount)
         setCorrectAnswer(correctOption);
-        setCurrentOptions(randomOptionsArray);
         
-        console.log('Current round: ', round);
-        setRound(prevRound => {return prevRound + 1}); // function that increments the round
+        // update value in useState for next round like a queue
+        setRound(prevRound => {return prevRound + 1}); // prevRound: parameter holding the round number 
+
+        const gameRound = round + 1; // show round value from 1 for the player, not 0
+        socket.emit('showQuestion', { gameQuestion, gameOptionsArray, gameRound });
+        setServerResMsg({ res: 'Question is now being showed to players' });
     };
+
+    const NextQuestion = () => {
+        // update next round question but not if the round(3) is equal to question length(3)
+        if (round !== questions.length) {
+            sendQuestion(questions);
+        } else {
+            // reached max round - end game
+            socket.emit('endGame');
+            setServerResMsg({ res: 'Game has ended! If you want to play again, click Init Game' });
+        };
+    };
+    
+    useEffect(() => {
+        // check if answer is correct for each round, emit playername to server, if they answered correctly
+        socket.on('playerChoice', (playerName, playerChoice, currentRound) => {
+            // if it is not undefined -- round-1 because arrays are indexed at 0 (current round -1 )
+            if(typeof questions[round-1] !== 'undefined' && currentRound === round) {
+                console.log('CORRECT ANSWER IS:', decodeURIComponent(correctAnswer));           
+                if (playerChoice === decodeURIComponent(correctAnswer)) {
+                    // GIVE POINT
+                    console.log(playerName, 'has answered CORRECTLY');
+                    socket.emit('updateScore', playerName);
+                } else {
+                    // NO POINT
+                    console.log(playerName, 'has NOT answered correctly!');
+                };
+            };
+            setServerResMsg({ res: 'When all players has answered, click Next question' });
+        });
+    }, [round]); // when round changes, useEffect should run again??
 
     return (
         <Container>
@@ -151,10 +139,11 @@ const GameMaster = ({ location }) => {
                 ) : (
                     <div>
                         <h2>Hello, Game Master {masterName}!</h2>
-                        <div className="serverRes"><strong>{serverResMsg.res}</strong></div>
+                        <div className="serverRes">
+                            <strong>{serverResMsg.res}</strong>
+                        </div>
                         <div className="button-container">
                             <Button variant="primary" size="md" onClick={InitGame}>Init Game</Button>
-                            <Button variant="primary" size="md" onClick={ShowQuestion}>Show question</Button>
                             <Button variant="primary" size="md" onClick={NextQuestion}>Next question</Button>
                         </div>
                         <div className="players-container">
