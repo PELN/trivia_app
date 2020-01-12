@@ -15,9 +15,7 @@ const Leaderboard = () => {
         .then(response => response.json())
         .then( (scores) => {
             setLeaderboard(scores);
-            // console.log(leaderboard);
         });
-
     }, []);
     
     return (
@@ -46,6 +44,5 @@ const Leaderboard = () => {
         </Container>
     );
 };
-
 
 export default Leaderboard;

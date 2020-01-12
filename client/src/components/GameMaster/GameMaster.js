@@ -91,15 +91,19 @@ const GameMaster = ({ location }) => {
         setCorrectAnswer(correctOption);
         
         // update value in useState for next round like a queue
+        // when this function has been executed, the round will be updated - when player makes a choice, round is 1
         setRound(prevRound => {return prevRound + 1}); // prevRound: parameter holding the round number 
+        
+        console.log('send Q round:', round)
 
         const gameRound = round + 1; // show round value from 1 for the player, not 0
+        console.log('send Q gameRound:', gameRound)
+
         socket.emit('showQuestion', { gameQuestion, gameOptionsArray, gameRound });
-        setServerResMsg({ res: 'Question is now being showed to players' });
     };
 
     const NextQuestion = () => {
-        // update next round question but not if the round(3) is equal to question length(3)
+        // get next round question but not if the round(3) is equal to question length(3)
         if (round !== questions.length) {
             sendQuestion(questions);
         } else {
@@ -111,13 +115,22 @@ const GameMaster = ({ location }) => {
     
     useEffect(() => {
         // check if answer is correct for each round, emit playername to server, if they answered correctly
-        socket.on('playerChoice', (playerName, playerChoice, currentRound) => {
-            // if it is not undefined -- round-1 because arrays are indexed at 0 (current round -1 )
-            if(typeof questions[round-1] !== 'undefined' && currentRound === round) {
+        socket.on('playerChoice', (playerName, playerChoice, gameRound) => {
+            // round is 0 the first time it is set, then next round it will be set to 1 (from sendQuestion func)
+            // then round and gameRound will both be 1
+            console.log(gameRound, round)
+            // next time page is loaded, the round is 1
+            // useEffect: every time a new round is set, it has to run the function again, and it keeps the previous states
+            // in the first render, the round is 0. it has to be set as dependency array to increment by 1 for each round and the effect will re-run
+            // the effect depends on the round value in the component
+            // next time it renders it will be 1, and then it can go into the if statement and execute the code
+            // round is set to 1 when the player has chosen an option, so gameRound and round are the same, but round 1 means question 2??
+            // round is one ahead when reaching this useEffect
+            if (gameRound === round) {
                 console.log('CORRECT ANSWER IS:', decodeURIComponent(correctAnswer));           
                 if (playerChoice === decodeURIComponent(correctAnswer)) {
                     // GIVE POINT
-                    console.log(playerName, 'has answered CORRECTLY');
+                    console.log(playerName, 'has answered CORRECTLY:', playerChoice);
                     socket.emit('updateScore', playerName);
                 } else {
                     // NO POINT
@@ -126,7 +139,7 @@ const GameMaster = ({ location }) => {
             };
             setServerResMsg({ res: 'When all players has answered, click Next question' });
         });
-    }, [round]); // when round changes, useEffect should run again??
+    }, [round]); // when round state changes, run effect again
 
     return (
         <Container>
@@ -149,7 +162,7 @@ const GameMaster = ({ location }) => {
                         <div className="players-container">
                             <h3>Players in room</h3>
                             <hr/>
-                            {playersInRoom.map((playerInfo, index) => 
+                            {playersInRoom.map((playerInfo, index) =>
                                 <p className="p-players" key={index}>
                                     Playername: {playerInfo.username}
                                 </p>

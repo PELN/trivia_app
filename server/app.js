@@ -104,7 +104,7 @@ io.on('connect', (socket) => {
         if (room.sockets.length > 2) {
             for (const client of room.sockets) {
                 client.emit('initGame');
-                callback({ res: "Game initialized - Click Show question to begin" });
+                callback({ res: "Game started - Question is being showed to players" });
             }
         } else {
             callback({ res: "Not enough users to start game - needs at least 2 players" });
@@ -117,16 +117,16 @@ io.on('connect', (socket) => {
     });
 
     // emit player choice from GameQuestion to GameMaster
-    socket.on('playerChoice', ({ playerName, choice, currentRound }) => {
+    socket.on('playerChoice', ({ playerName, choice, gameRound }) => {
         const room = rooms[socket.roomName];
-        room.sockets[0].emit('playerChoice', playerName, choice, currentRound); // the first socket is game master
+        room.sockets[0].emit('playerChoice', playerName, choice, gameRound); // the first socket is game master
     });
 
     // increment score for player when they answered correctly
     socket.on('updateScore', (playerName) => {
         const room = rooms[socket.roomName];
         room.players[playerName].score += 1;
-        // console.log('player score', room.players[playerName].score);
+        console.log(playerName, room.players[playerName].score);
     });
 
     // GameMaster emits endGame, and scores are send

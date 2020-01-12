@@ -6,10 +6,10 @@ import './EndGame.css';
 const EndGame = ({ players, player }) => {
     let history = useHistory();
 
-    const handleSubmit = async e => {
+    const handleSubmit = e => {
         e.preventDefault();
 
-        fetch('http://localhost:5000/scores/save' , {
+        fetch('http://localhost:5000/scores/save', {
             method: 'POST',
             body: JSON.stringify({
                 username: player.username, 

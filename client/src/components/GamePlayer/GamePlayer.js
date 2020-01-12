@@ -21,28 +21,25 @@ const GamePlayer = ({ location }) => {
     
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
+    const [playersInRoom, setPlayersInRoom] = useState([]);
 
     const [gameStart, setGameStart] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState('');
     const [currentOptions, setCurrentOptions] = useState([]);
     const [currentRound, setCurrentRound] = useState(0);
-
-    const [playersInRoom, setPlayersInRoom] = useState([]);
-
+    const [correctAnswer, setCorrectAnswer] = useState('');
     const [clickActivated, setClickActivated] = useState(true);
 
     // game end
     const [players, setPlayers] = useState([]); // to get final score
-    const [gameEnd, setGameEnd] = useState(false); // to get final score
+    const [gameEnd, setGameEnd] = useState(false);
     const [player, setPlayer] = useState(''); // to get each client final score
 
     useEffect(() => {
         const { joinRoomName, playerName } = queryString.parse(location.search);
         socket = io.connect(server);
-
         setJoinRoomName(joinRoomName);
         setPlayerName(playerName);
-        console.log('room:', joinRoomName, 'name:', playerName);
     
         socket.emit('joinRoom', { joinRoomName, playerName }, (error) => {
             if (error) {
@@ -53,9 +50,7 @@ const GamePlayer = ({ location }) => {
         });
         
         socket.on('playerData', (allPlayersInRoom) => {
-            console.log(allPlayersInRoom);
-            setPlayersInRoom(allPlayersInRoom);
-            console.log('all players in room:', playersInRoom); // is empty the first time, but it is set the next time
+            setPlayersInRoom(allPlayersInRoom); // is empty the first time, but it is set the next time
         });
 
         return () => {
@@ -82,14 +77,12 @@ const GamePlayer = ({ location }) => {
             setCurrentRound(gameRound);
             setGameStart(true);
             setGameEnd(false);
-            console.log("This is the clicky status:", clickActivated);
             setClickActivated(true); // set click status to true on each round, to show question in GameQuestion
         });
     },[]);
 
     // set value to false from click function in GameQuestion (onClickChange)
     const handleClickChange = (val) => {
-        console.log("This is the value of clicky", val);
         setClickActivated(val); // set value from GameQuestion
     };
 
@@ -149,6 +142,7 @@ const GamePlayer = ({ location }) => {
                                     socket={socket} 
                                     clickStatus={clickActivated} 
                                     onClickChange={handleClickChange}
+                                    correctAnswer={correctAnswer}
                                 />
                             ) : (
                                 <EndGame players={players} player={player} />
