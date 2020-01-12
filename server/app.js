@@ -126,7 +126,11 @@ io.on('connect', (socket) => {
     socket.on('updateScore', (playerName) => {
         const room = rooms[socket.roomName];
         room.players[playerName].score += 1;
-        console.log(playerName, room.players[playerName].score);
+    });
+    
+    socket.on('correctAnswer', (correctAnswer, playerName) => {
+        const room = rooms[socket.roomName];
+        socket.to(room.players[playerName].id).emit('correctAnswer', correctAnswer);
     });
 
     // GameMaster emits endGame, and scores are send
@@ -139,7 +143,7 @@ io.on('connect', (socket) => {
 
         // send individual score to each client - to save score
         for (const client of res) {
-            socket.to(client.id).emit("finalPlayerInfo", client);
+            socket.to(client.id).emit('finalPlayerInfo', client);
         };
     });
     
@@ -148,7 +152,7 @@ io.on('connect', (socket) => {
         // console.log(rooms[socket.roomName].sockets[0].id);
         const room = rooms[socket.roomName];
         // if room has been deleted when master leaving the game
-        if(typeof room == "undefined") {
+        if(typeof room == 'undefined') {
             console.log('Room does not exist, leave the room');
         } else {
             const room = rooms[socket.roomName];

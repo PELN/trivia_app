@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './GameQuestion.css';
 
-const GameQuestion = ({ currentQuestion, currentOptions, currentRound, playerName, socket, clickStatus, onClickChange }) => {
+const GameQuestion = ({ currentQuestion, currentOptions, currentRound, playerName, socket, clickStatus, onClickChange, correctAnswer }) => {
     const [playerChoice, setPlayerChoice] = useState('');
     const [clickActivated, setClickActivated] = useState(clickStatus); // clickActivated from GamePlayer: true by default
     
@@ -16,7 +16,7 @@ const GameQuestion = ({ currentQuestion, currentOptions, currentRound, playerNam
         setClickActivated(false); // when player has clicked on a choice the click is set to false, to show their choice
         onClickChange(false); // function: set handleClickChange to false in GamePlayer
     };
-    
+
     return (
         <div>
             <div className="round-container">
@@ -39,6 +39,7 @@ const GameQuestion = ({ currentQuestion, currentOptions, currentRound, playerNam
             ) : (
                 <div>
                     <h3 className="h3-chosen-option">You chose: {playerChoice}</h3>
+                    <p className="correct-answer">Correct answer is: {decodeURIComponent(correctAnswer)}</p>
                 </div>
                 )
             }

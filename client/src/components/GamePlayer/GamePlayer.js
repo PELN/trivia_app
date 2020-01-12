@@ -32,7 +32,7 @@ const GamePlayer = ({ location }) => {
 
     // game end
     const [players, setPlayers] = useState([]); // to get final score
-    const [gameEnd, setGameEnd] = useState(false);
+    const [gameEnd, setGameEnd] = useState(false); 
     const [player, setPlayer] = useState(''); // to get each client final score
 
     useEffect(() => {
@@ -57,7 +57,7 @@ const GamePlayer = ({ location }) => {
             socket.emit('disconnect');
             socket.disconnect();
         };
-    }, [server, location.search]);
+    }, [server]);
 
     useEffect(() => {
         socket.on('message', (text) => {
@@ -67,7 +67,6 @@ const GamePlayer = ({ location }) => {
             setMessages([...messages, message ]); // use spread operator to send whole array + add the message to it
         });
     }, [messages]); //when messages array changes rerender effect
-
 
     useEffect(() => {
         socket.on('currentRound', (gameQuestion, gameOptionsArray, gameRound) => {
@@ -88,6 +87,10 @@ const GamePlayer = ({ location }) => {
 
     // get all players score - pass it to EndGame
     useEffect(() => {
+        socket.on('correctAnswer', (correctAnswer) => {
+            setCorrectAnswer(correctAnswer);
+        });
+        
         socket.on('scores', (players) => {
             setPlayers(players);
             setGameEnd(true);
