@@ -5,7 +5,7 @@ import io from 'socket.io-client';
 import Messages from '../Messages/Messages';
 import './GameMaster.css';
 
-let socket;
+let socket; // let can be declared without a value, const can not
 
 const GameMaster = ({ location }) => {
     const server = 'localhost:5000';
@@ -69,7 +69,7 @@ const GameMaster = ({ location }) => {
     useEffect(() => {
         socket.on('initGame', () => {
             setRound(0);
-            const response = fetch("https://opentdb.com/api.php?amount=3&type=multiple&encode=url3986")
+            const response = fetch("https://opentdb.com/api.php?amount=5&type=multiple&encode=url3986")
                 .then(response => response.json())
                 .then(res => {
                     setQuestions(res.results);
@@ -82,14 +82,14 @@ const GameMaster = ({ location }) => {
         const gameQuestion = questionObj[round].question;
         const incorrectOptions = questionObj[round].incorrect_answers;
         const correctOption = questionObj[round].correct_answer;
-
+        
         // array of options where correct option is in random position
         const gameOptionsArray = [...incorrectOptions];
         const randomNumber = Math.random() * 3; // get random number between 0 and 1 (multiply with 3)
         const position = Math.floor(randomNumber) + 1; // round randomNumber down and add 1 to it
         gameOptionsArray.splice(position -1, 0, correctOption); // splice returns removed items from array (start pos, deleteCount)
         setCorrectAnswer(correctOption);
-        
+
         // when function has been executed, round will be updated - when player makes a choice, round is 1
         setRound(prevRound => {return prevRound + 1}); // prevRound: parameter holding the round number 
         
@@ -112,7 +112,6 @@ const GameMaster = ({ location }) => {
         // check if answer is correct for each round, emit playername to server, if they answered correctly
         socket.on('playerChoice', (playerName, playerChoice, gameRound) => {
             if (gameRound === round) {
-                console.log('CORRECT ANSWER IS:', decodeURIComponent(correctAnswer));           
                 if (playerChoice === decodeURIComponent(correctAnswer)) {
                     console.log(playerName, 'has answered CORRECTLY:', playerChoice);
                     socket.emit('updateScore', playerName);

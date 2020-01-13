@@ -28,7 +28,7 @@ const GameQuestion = ({ currentQuestion, currentOptions, currentRound, playerNam
                         <h2>{decodeURIComponent(currentQuestion.question)}</h2>
                     </div>
                     <div className="options-container">
-                        {currentOptions.map((option, index) =>
+                        { currentOptions.map((option, index) =>
                             <div className="option" key={index} onClick={clickOption}>
                                 {decodeURIComponent(option)}
                             </div>

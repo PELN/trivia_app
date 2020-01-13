@@ -74,6 +74,7 @@ const GamePlayer = ({ location }) => {
             setCurrentQuestion(gameQuestion);
             setCurrentOptions(gameOptionsArray);
             setCurrentRound(gameRound);
+            setCorrectAnswer('');
             setGameStart(true);
             setGameEnd(false);
             setClickActivated(true); // set click status to true on each round, to show question in GameQuestion
@@ -85,12 +86,14 @@ const GamePlayer = ({ location }) => {
         setClickActivated(val); // set value from GameQuestion
     };
 
-    // get all players score - pass it to EndGame
     useEffect(() => {
         socket.on('correctAnswer', (correctAnswer) => {
             setCorrectAnswer(correctAnswer);
         });
-        
+    }, []);
+
+    // get all players score - pass it to EndGame
+    useEffect(() => {
         socket.on('scores', (players) => {
             setPlayers(players);
             setGameEnd(true);

@@ -92,9 +92,8 @@ io.on('connect', (socket) => {
             socket.emit('message', { text: `Welcome ${playerName} to the game in ${room.name}.` });
             socket.broadcast.to(room.id).emit('message', { text: `${playerName} has joined the game!` });
 
-            // show all players in the room to everyone
             allPlayersInRoom = Object.values(room.players); // to send value from key/value obj in socket, bug in socket
-            io.to(room.id).emit('playerData', allPlayersInRoom);
+            io.to(room.id).emit('playerData', allPlayersInRoom); // io, to everyone including sender
         });
     };
 
@@ -138,7 +137,6 @@ io.on('connect', (socket) => {
         // send scores back to all players
         const room = rooms[socket.roomName];
         res = Object.values(room.players); // to send array with keys that has objects as values
-        // console.log('GAME END SCORES', res);
         io.to(room.id).emit('scores', res);
 
         // send individual score to each client - to save score
@@ -149,7 +147,6 @@ io.on('connect', (socket) => {
     
     socket.on('disconnect', () => {
         console.log('User left with socket id', socket.id);
-        // console.log(rooms[socket.roomName].sockets[0].id);
         const room = rooms[socket.roomName];
         // if room has been deleted when master leaving the game
         if(typeof room == 'undefined') {
@@ -157,13 +154,10 @@ io.on('connect', (socket) => {
         } else {
             const room = rooms[socket.roomName];
             // if room exists, delete player from players array in that room
-            // when refreshing master page, the room is deleted, so there are not any sockets in the room
             if(room.sockets[0].id !== socket.id) {
                 console.log(room.players[socket.username].username, 'has left');
                 socket.broadcast.to(socket.roomId).emit('message', { text: `${room.players[socket.username].username} has left the game!` });
-                
-                // remove player from players array
-                delete room.players[socket.username];
+                delete room.players[socket.username]; // remove player from players array
                 
                 // update room players array
                 allPlayersInRoom = Object.values(room.players);
@@ -175,8 +169,7 @@ io.on('connect', (socket) => {
                 console.log(room.sockets[0].username, 'has left');
                 socket.broadcast.to(socket.roomId).emit('message', { text: `The gamemaster ${room.sockets[0].username} has left the game! Please leave the room.` });
                 
-                // remove room from rooms
-                delete rooms[room.name];
+                delete rooms[room.name]; // remove room from rooms
             };
         };
     });
