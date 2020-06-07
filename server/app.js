@@ -3,6 +3,7 @@ const socketio = require('socket.io');
 const http = require('http');
 const PORT = 5000;
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
@@ -12,13 +13,18 @@ const io = socketio(server, {
     cookie: false
 });
 
-// middleware: methods/functions between request and response
+// MIDDLEWARE
 app.use(cors());
-app.use(express.json()); // POST req, get incoming data from body as JSON (req.body)
+app.use(express.json());
 const scores = require('./routes/scores');
-app.use('/scores', scores); // use route for api
+app.use('/scores', scores);
 
-// MONGO 
+app.use(express.static(path.join(__dirname, 'build')));
+
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/trivia', {
     useNewUrlParser: true, 
@@ -35,13 +41,12 @@ rooms = [];
 io.on('connect', (socket) => {
     console.log('new connection', socket.id);
     
-    // GameMaster creates room and joins it
+    socket.emit('newConn', {msg: 'welcome'});
+
     socket.on('createRoom', ({ roomName, masterName }, callback) => {
-        // check if room name exists before it is created
         if (rooms[roomName]) {
             return callback({ error: "Room already exists with that name, try another!" });
-        }
-        // create room object
+        };
         const room = {
             id: uuidv1(),
             name: roomName,
@@ -49,55 +54,44 @@ io.on('connect', (socket) => {
             players: []
         };
         rooms[roomName] = room;
-
+        
         joinRoom(socket, room, masterName);
     });
 
-    // player joins game that GameMaster has created
     socket.on('joinRoom', ({ joinRoomName, playerName }, callback) => {
         const room = rooms[joinRoomName];
-
-        // check if rooms array is empty / check if joinRoomName exists in rooms
         if (typeof room === 'undefined' ) {
             return callback({ error: "No rooms created with that name" });
         };
-        // check if playername is empty
         if (playerName === '') {
             return callback({ error: "You have to fill out player name" });
         };
-        // check if playername already exists in room
-        if (room.players[playerName]){
+        if (room.players[playerName]) {
             return callback ({ error: "A player with that name is already in the room" });
         };
-
         joinRoom(socket, room, playerName);
-        callback();
     });
 
-    // function for joining room (used by createRoom and joinRoom)
     const joinRoom = (socket, room, playerName) => {
         socket.join(room.id, () => {
             room.sockets.push(socket);
-            // saving info in the socket for later use to identify each user
             socket.roomId = room.id;
             socket.roomName = room.name;
             socket.username = playerName;
             
-            // if it is not the first socket (master), then add player to players
             if(room.sockets.length !== 1) {
                 const player = { id: socket.id, username: playerName, score: 0 }
-                rooms[socket.roomName].players[playerName] = player; // playerName as key and player object as value
+                rooms[socket.roomName].players[playerName] = player;
             };
 
             socket.emit('message', { text: `Welcome ${playerName} to the game in ${room.name}.` });
             socket.broadcast.to(room.id).emit('message', { text: `${playerName} has joined the game!` });
 
-            allPlayersInRoom = Object.values(room.players); // to send value from key/value obj in socket, bug in socket
+            allPlayersInRoom = Object.values(room.players); // send key/value obj in socket
             io.to(room.id).emit('playerData', allPlayersInRoom); // io, to everyone including sender
         });
     };
 
-    // let GameMaster know if there are enough players to emit 'initGame', to fetch API
     socket.on('ready', (callback)  => {
         const room = rooms[socket.roomName];
         if (room.sockets.length > 2) {
@@ -106,22 +100,19 @@ io.on('connect', (socket) => {
                 callback({ res: "Game started - Question is being showed to players" });
             }
         } else {
-            callback({ res: "Not enough users to start game - needs at least 2 players" });
+            callback({ res: "Not enough players to start game - needs at least 2 players" });
         }
     });
 
-    // GameMaster emits the question to server, and server broadcasts question to all players
     socket.on('showQuestion', ({ gameQuestion, gameOptionsArray, gameRound }) => {
         socket.broadcast.to(socket.roomId).emit('currentRound', { question: `${gameQuestion}` }, gameOptionsArray, gameRound);
     });
 
-    // emit player choice from GameQuestion to GameMaster
     socket.on('playerChoice', ({ playerName, choice, gameRound }) => {
         const room = rooms[socket.roomName];
-        room.sockets[0].emit('playerChoice', playerName, choice, gameRound); // the first socket is game master
+        room.sockets[0].emit('playerChoice', playerName, choice, gameRound); // first socket is game master
     });
 
-    // increment score for player when they answered correctly
     socket.on('updateScore', (playerName) => {
         const room = rooms[socket.roomName];
         room.players[playerName].score += 1;
@@ -132,14 +123,12 @@ io.on('connect', (socket) => {
         socket.to(room.players[playerName].id).emit('correctAnswer', correctAnswer);
     });
 
-    // GameMaster emits endGame, and scores are send
     socket.on('endGame', () => {
-        // send scores back to all players
         const room = rooms[socket.roomName];
-        res = Object.values(room.players); // to send array with keys that has objects as values
+        res = Object.values(room.players); // send array with keys that has objects as values
         io.to(room.id).emit('scores', res);
 
-        // send individual score to each client - to save score
+        // send individual score to each client
         for (const client of res) {
             socket.to(client.id).emit('finalPlayerInfo', client);
         };
@@ -157,19 +146,17 @@ io.on('connect', (socket) => {
             if(room.sockets[0].id !== socket.id) {
                 console.log(room.players[socket.username].username, 'has left');
                 socket.broadcast.to(socket.roomId).emit('message', { text: `${room.players[socket.username].username} has left the game!` });
-                delete room.players[socket.username]; // remove player from players array
+                delete room.players[socket.username];
                 
                 // update room players array
                 allPlayersInRoom = Object.values(room.players);
                 io.to(room.id).emit('playerData', allPlayersInRoom);
             } else {
+                // delete room if gamemaster left
                 const room = rooms[socket.roomName];
-
-                // send msg to players that master left
                 console.log(room.sockets[0].username, 'has left');
                 socket.broadcast.to(socket.roomId).emit('message', { text: `The gamemaster ${room.sockets[0].username} has left the game! Please leave the room.` });
-                
-                delete rooms[room.name]; // remove room from rooms
+                delete rooms[room.name];
             };
         };
     });

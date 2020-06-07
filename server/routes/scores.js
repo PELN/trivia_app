@@ -33,7 +33,6 @@ router.put('/update/:username', (req, res) => {
 
 router.delete('/delete/:username', (req, res) => {
     const { username } = req.params;
-    console.log(username);
     Score.findOneAndDelete({username: username}, 
         (err, result) => {
             if(err) { return res.send(500, err) };
