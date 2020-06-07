@@ -3,7 +3,7 @@ import './GameQuestion.css';
 
 const GameQuestion = ({ currentQuestion, currentOptions, currentRound, playerName, socket, clickStatus, onClickChange, correctAnswer }) => {
     const [playerChoice, setPlayerChoice] = useState('');
-    const [clickActivated, setClickActivated] = useState(clickStatus); // clickActivated from GamePlayer: true by default
+    const [clickActivated, setClickActivated] = useState(clickStatus); // true by default
     
     const clickOption = (event) => {
         const choice = event.target.innerText;
@@ -13,8 +13,8 @@ const GameQuestion = ({ currentQuestion, currentOptions, currentRound, playerNam
         });
         setPlayerChoice(choice);
 
-        setClickActivated(false); // when player has clicked on a choice the click is set to false, to show their choice
-        onClickChange(false); // function: set handleClickChange to false in GamePlayer
+        setClickActivated(false);
+        onClickChange(false); // handleClickChange in GamePlayer
     };
 
     return (

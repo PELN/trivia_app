@@ -11,9 +11,7 @@ const GameMaster = ({ location }) => {
     const server = 'localhost:5000';
     const [roomName, setRoomName] = useState('');
     const [masterName, setMasterName] = useState('');
-    
     const [serverResMsg, setServerResMsg] = useState({res: 'When at least 2 players are in the room, click Init Game'});
-
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
 
@@ -27,11 +25,11 @@ const GameMaster = ({ location }) => {
     const [playersInRoom, setPlayersInRoom] = useState([]);
 
     useEffect(() => {
-        const { roomName, masterName } = queryString.parse(location.search); // parse query to object and destructure it
+        const { roomName, masterName } = queryString.parse(location.search);
         socket = io.connect(server);
         setRoomName(roomName);
         setMasterName(masterName);
-
+        
         socket.emit('createRoom', { roomName, masterName }, (error) => {
             if (error) {
                 setError(true);
@@ -39,9 +37,9 @@ const GameMaster = ({ location }) => {
                 console.log(error);
             };
         });
-        
+
         socket.on('playerData', (allPlayersInRoom) => {
-            setPlayersInRoom(allPlayersInRoom); // is empty the first time, but it is set the next time
+            setPlayersInRoom(allPlayersInRoom);
         });
 
         return () => {
@@ -56,7 +54,7 @@ const GameMaster = ({ location }) => {
         });
 
         socket.on('message', (message) => {
-            setMessages([...messages, message ]); // use spread operator to send whole array + add the message to it
+            setMessages([...messages, message ]);
         });
     }, [messages]);
 
@@ -69,7 +67,7 @@ const GameMaster = ({ location }) => {
     useEffect(() => {
         socket.on('initGame', () => {
             setRound(0);
-            const response = fetch("https://opentdb.com/api.php?amount=5&type=multiple&encode=url3986")
+            const response = fetch(`https://opentdb.com/api.php?amount=4&type=multiple&encode=url3986`)
                 .then(response => response.json())
                 .then(res => {
                     setQuestions(res.results);
@@ -83,33 +81,28 @@ const GameMaster = ({ location }) => {
         const incorrectOptions = questionObj[round].incorrect_answers;
         const correctOption = questionObj[round].correct_answer;
         
-        // array of options where correct option is in random position
         const gameOptionsArray = [...incorrectOptions];
-        const randomNumber = Math.random() * 3; // get random number between 0 and 1 (multiply with 3)
-        const position = Math.floor(randomNumber) + 1; // round randomNumber down and add 1 to it
-        gameOptionsArray.splice(position -1, 0, correctOption); // splice returns removed items from array (start pos, deleteCount)
+        const randomNumber = Math.random() * 3;
+        const position = Math.floor(randomNumber) + 1;
+        gameOptionsArray.splice(position -1, 0, correctOption); // startpos: 0, delete 0, add
         setCorrectAnswer(correctOption);
 
-        // when function has been executed, round will be updated - when player makes a choice, round is 1
-        setRound(prevRound => {return prevRound + 1}); // prevRound: parameter holding the round number 
-        
-        const gameRound = round + 1; // show round value from 1 for the player, not 0
+        setRound(prevRound => {return prevRound + 1}); // setRound for next render, prevRound: holds the round number
+
+        const gameRound = round + 1;
         socket.emit('showQuestion', { gameQuestion, gameOptionsArray, gameRound });
     };
 
     const NextQuestion = () => {
-        // get next round question but not if the round(3) is equal to question length(3)
         if (round !== questions.length) {
             sendQuestion(questions);
         } else {
-            // reached max round - end game
             socket.emit('endGame');
             setServerResMsg({ res: 'Game has ended! If you want to play again, click Init Game' });
         };
     };
     
     useEffect(() => {
-        // check if answer is correct for each round, emit playername to server, if they answered correctly
         socket.on('playerChoice', (playerName, playerChoice, gameRound) => {
             if (gameRound === round) {
                 if (playerChoice === decodeURIComponent(correctAnswer)) {
@@ -120,7 +113,7 @@ const GameMaster = ({ location }) => {
             };
             setServerResMsg({ res: 'When all players has answered, click Next question' });
         });
-    }, [round]); // when round state changes, run effect again
+    }, [round]);
 
     return (
         <Container>
@@ -136,7 +129,7 @@ const GameMaster = ({ location }) => {
                         <div className="serverRes">
                             <strong>{serverResMsg.res}</strong>
                         </div>
-                        <div className="button-container">
+                        <div className="button-container">                            
                             <Button variant="primary" size="md" onClick={InitGame}>Init Game</Button>
                             <Button variant="primary" size="md" onClick={NextQuestion}>Next question</Button>
                         </div>

@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import queryString from 'query-string';
 import io from 'socket.io-client';
-
 import Messages from '../Messages/Messages';
 import GameQuestion from '../GameQuestion/GameQuestion';
 import EndGame from '../EndGame/EndGame';
-
 import { Container } from 'react-bootstrap';
-import './GamePlayer.css';
 
 let socket;
 
@@ -64,26 +61,26 @@ const GamePlayer = ({ location }) => {
             setMessage(text);
         });
         socket.on('message', (message) => {
-            setMessages([...messages, message ]); // use spread operator to send whole array + add the message to it
+            setMessages([...messages, message ]);
         });
-    }, [messages]); //when messages array changes rerender effect
+    }, [messages]);
 
     useEffect(() => {
         socket.on('currentRound', (gameQuestion, gameOptionsArray, gameRound) => {
-            console.log(gameQuestion, gameOptionsArray, gameRound);
+            // console.log(gameQuestion, gameOptionsArray, gameRound);
             setCurrentQuestion(gameQuestion);
             setCurrentOptions(gameOptionsArray);
             setCurrentRound(gameRound);
             setCorrectAnswer('');
             setGameStart(true);
             setGameEnd(false);
-            setClickActivated(true); // set click status to true on each round, to show question in GameQuestion
+            setClickActivated(true);
         });
     },[]);
 
     // set value to false from click function in GameQuestion (onClickChange)
     const handleClickChange = (val) => {
-        setClickActivated(val); // set value from GameQuestion
+        setClickActivated(val);
     };
 
     useEffect(() => {
@@ -92,16 +89,13 @@ const GamePlayer = ({ location }) => {
         });
     }, []);
 
-    // get all players score - pass it to EndGame
     useEffect(() => {
         socket.on('scores', (players) => {
             setPlayers(players);
             setGameEnd(true);
         });
         
-        // each player/client info to save score
         socket.on('finalPlayerInfo', (client) => {
-            console.log(client);
             setPlayer(client);
         });
     }, []);
@@ -137,7 +131,6 @@ const GamePlayer = ({ location }) => {
                             <a href="/">Leave room</a>
                         </div>
                     ) : (
-                        // if game has ended - show endgame component instead of game question
                         <div>
                             { gameEnd === false ? (
                                 <GameQuestion

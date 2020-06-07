@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Form, Container, Row, Col, Button } from 'react-bootstrap';
-
 import './JoinGame.css';
 
 const JoinGame = () => {
