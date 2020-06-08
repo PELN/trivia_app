@@ -3,7 +3,7 @@ const socketio = require('socket.io');
 const http = require('http');
 const PORT = 5000;
 const cors = require('cors');
-const path = require('path');
+// const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
@@ -19,11 +19,11 @@ app.use(express.json());
 const scores = require('./routes/scores');
 app.use('/scores', scores);
 
-app.use(express.static(path.join(__dirname, 'build')));
+// app.use(express.static(path.join(__dirname, 'build')));
 
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
+// app.get('/*', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// });
 
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/trivia', {
