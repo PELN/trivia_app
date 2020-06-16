@@ -1,5 +1,5 @@
 # Trivia app
-Technologies: React, Node/express, Socket.io, MongoDB/mongoose
+Technologies: React/hooks, Node/express, Socket.io, MongoDB/mongoose
 Requirements: Use node/react, connect to a database, use sockets, connect to an API
 
 ## Project description
@@ -8,6 +8,8 @@ For the exam in my node/react elective I have built a trivia/quiz application us
 Sockets enables realtime communication between web clients and servers.
 
 I have used socket rooms to create, join and leave a game.
+
+For the frontend, I have used React Hooks and bootstrap (the design/UX was not prioritized)
 
 ## Guide
 
