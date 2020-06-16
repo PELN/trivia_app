@@ -1,5 +1,6 @@
 # Trivia app
 Technologies: React/hooks, Node/express, Socket.io, MongoDB/mongoose
+
 Requirements: Use node/react, connect to a database, use sockets, connect to an API
 
 ## Project description
