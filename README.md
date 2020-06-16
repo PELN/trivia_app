@@ -9,6 +9,8 @@ Sockets enables realtime communication between web clients and servers.
 
 I have used socket rooms to create, join and leave a game.
 
+The questions are fetched from this API: https://opentdb.com/api_config.php
+
 For the frontend, I have used React Hooks and bootstrap (the design/UX was not prioritized)
 
 ## Guide
