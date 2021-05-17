@@ -36,5 +36,5 @@ For the frontend, I have used React Hooks and bootstrap (the design/UX was not p
 
 10. and so on, for as many rounds there are
 
-11. when game is finished, the scores of each player are diaplyed - they can either save it to a highscore list or leave the game
+11. when game is finished, the scores of each player are dispalyed - they can either save it to a highscore list or leave the game
 
