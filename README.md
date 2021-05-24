@@ -26,7 +26,7 @@ Have node.js, npm, nodemon, react-scripts installed.
 2. in the terminal, cd into server folder and run npm start
 
 3. in another terminal, cd into client folder and run npm start
-- a browser should open up with the start page
+- a browser should open up with localhost:3000
 
 4. in one browser, create a game 
 
