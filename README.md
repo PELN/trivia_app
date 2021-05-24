@@ -1,4 +1,3 @@
-![demo](https://user-images.githubusercontent.com/31202787/119365222-017a7280-bcb0-11eb-85af-37e298d419aa.gif)
 # Trivia app
 Technologies: React/hooks, Node/express, Socket.io, MongoDB/mongoose
 
@@ -44,5 +43,5 @@ Have node.js, npm, nodemon, react-scripts installed.
 
 12. they can continue playing in the same "room" if they stay, and the game master clicks "Start Game" again 
 
-## Screenshots of project
+## Demo
 
