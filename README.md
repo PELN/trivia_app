@@ -31,15 +31,17 @@ Have node.js, npm, nodemon, react-scripts installed.
 
 6. in a third browser, also join the same game
 
-7. the game master starts the game by clicking "Init Game"
+7. the game master starts the game by clicking "Start Game"
 
-8. the players emit their answer in each browser 
+8. the players emit their answer in their respective browser
 
 9. when all players have answered - the game master clicks "Next question"
 
 10. and so on, for as many rounds there are
 
-11. when game is finished, the scores of each player are dispalyed - they can either save it to a highscore list or leave the game
+11. when the game is finished, the scores of each player are dispalyed - they can either save it to a highscore list or leave the game
+
+12. they can continue playing in the same "room" if they stay, and the game master clicks "Start Game" again 
 
 ## Screenshots of project
 
