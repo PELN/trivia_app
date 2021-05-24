@@ -17,7 +17,7 @@ For the frontend, I have used React Hooks and bootstrap (the design/UX was not p
 <img width="650" alt="Screenshot 2021-05-24 at 16 57 03" src="https://user-images.githubusercontent.com/31202787/119367595-646d0900-bcb2-11eb-96f5-bc52abba25aa.png">
 
 
-## Guide
+## Set-up guide
 
 Have node.js, npm, nodemon, react-scripts installed.
 
