@@ -67,7 +67,6 @@ const GamePlayer = ({ location }) => {
 
     useEffect(() => {
         socket.on('currentRound', (gameQuestion, gameOptionsArray, gameRound) => {
-            // console.log(gameQuestion, gameOptionsArray, gameRound);
             setCurrentQuestion(gameQuestion);
             setCurrentOptions(gameOptionsArray);
             setCurrentRound(gameRound);

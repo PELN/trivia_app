@@ -22,8 +22,6 @@ router.post('/save', (req, res) => {
 
 router.put('/update/:username', (req, res) => {
     const { username } = req.params;
-    // console.log(username);
-    // console.log(req.body)
     Score.updateOne({username: username}, {$set:{username: req.body.username}}, (err) => {
         if(!err){
             return res.json({ message: `success, username updated to ${req.body.username}` })

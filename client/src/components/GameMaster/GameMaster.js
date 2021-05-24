@@ -11,7 +11,7 @@ const GameMaster = ({ location }) => {
     const server = 'localhost:5000';
     const [roomName, setRoomName] = useState('');
     const [masterName, setMasterName] = useState('');
-    const [serverResMsg, setServerResMsg] = useState({res: 'When at least 2 players are in the room, click Init Game'});
+    const [serverResMsg, setServerResMsg] = useState({res: 'When at least 2 players are in the room, click Start Game'});
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
 
@@ -98,7 +98,7 @@ const GameMaster = ({ location }) => {
             sendQuestion(questions);
         } else {
             socket.emit('endGame');
-            setServerResMsg({ res: 'Game has ended! If you want to play again, click Init Game' });
+            setServerResMsg({ res: 'The game has ended! If you want to play again, click Start Game' });
         };
     };
     
@@ -130,7 +130,7 @@ const GameMaster = ({ location }) => {
                             <strong>{serverResMsg.res}</strong>
                         </div>
                         <div className="button-container">                            
-                            <Button variant="primary" size="md" onClick={InitGame}>Init Game</Button>
+                            <Button variant="primary" size="md" onClick={InitGame}>Start Game</Button>
                             <Button variant="primary" size="md" onClick={NextQuestion}>Next question</Button>
                         </div>
                         <div className="players-container">
