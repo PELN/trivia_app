@@ -14,7 +14,7 @@ The questions are fetched from this API: https://opentdb.com/api_config.php
 
 For the frontend, I have used React Hooks and bootstrap (the design/UX was not prioritized as much as functionality)
 
-<img width="200" alt="Screenshot 2021-05-24 at 17 02 37" src="https://user-images.githubusercontent.com/31202787/119367391-3091e380-bcb2-11eb-80ce-a5bd59d4681c.png"><img width="500" alt="Screenshot 2021-05-24 at 16 57 03" src="https://user-images.githubusercontent.com/31202787/119367595-646d0900-bcb2-11eb-96f5-bc52abba25aa.png">
+<img width="650" alt="Screenshot 2021-05-24 at 16 57 03" src="https://user-images.githubusercontent.com/31202787/119367595-646d0900-bcb2-11eb-96f5-bc52abba25aa.png">
 
 
 ## Guide
