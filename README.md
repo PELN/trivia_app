@@ -1,3 +1,4 @@
+![demo](https://user-images.githubusercontent.com/31202787/119365222-017a7280-bcb0-11eb-85af-37e298d419aa.gif)
 # Trivia app
 Technologies: React/hooks, Node/express, Socket.io, MongoDB/mongoose
 
