@@ -14,10 +14,25 @@ const io = socketio(server, {
 });
 
 // MIDDLEWARE
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
 const scores = require('./routes/scores');
 app.use('/scores', scores);
+
+const whitelist = ['http://localhost:3000', 'http://localhost:5000']
+const corsOptions = {
+  origin: function (origin, callback) {
+    console.log("** Origin of request " + origin)
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      console.log("Origin acceptable")
+      callback(null, true)
+    } else {
+      console.log("Origin rejected")
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+app.use(cors(corsOptions))
 
 if (process.env.NODE_ENV === 'production') {
     // Serve any static files
