@@ -16,11 +16,14 @@ For the frontend, I have used React Hooks and bootstrap (the design/UX was not p
 
 ## Guide
 
+Have node.js, npm, nodemon, react-scripts installed.
+
 1. git clone project
 
 2. in the terminal, cd into server folder and run npm start
 
 3. in another terminal, cd into client folder and run npm start
+- a browser should open up with the start page
 
 4. in one browser, create a game 
 
@@ -37,4 +40,6 @@ For the frontend, I have used React Hooks and bootstrap (the design/UX was not p
 10. and so on, for as many rounds there are
 
 11. when game is finished, the scores of each player are dispalyed - they can either save it to a highscore list or leave the game
+
+## Screenshots of project
 
