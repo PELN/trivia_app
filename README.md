@@ -44,4 +44,5 @@ Have node.js, npm, nodemon, react-scripts installed.
 12. they can continue playing in the same "room" if they stay, and the game master clicks "Start Game" again 
 
 ## Demo
+![demo2](https://user-images.githubusercontent.com/31202787/119366573-684c5b80-bcb1-11eb-965e-283f656f647c.gif)
 
