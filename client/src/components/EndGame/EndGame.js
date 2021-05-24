@@ -53,13 +53,13 @@ const EndGame = ({ players, player }) => {
 
                 <div className="save-score-container">
                     <h3>Save score to leaderboard</h3>
-                    <p>If you want to play again in the same room, don't save your score!</p>
                     <Form onSubmit={handleSubmit} method="POST">
                         <input disabled={true} readOnly defaultValue={player.username} className="form-control"/>
                         <input disabled={true} readOnly defaultValue={player.score} className="form-control"/>
                         <Button variant="primary" type="submit">Save score</Button>
                     </Form>
                 </div>
+                <p>Don't leave, if you want to play again!</p>
                 <a href="/">Leave room</a>
             </div>
         </Container>

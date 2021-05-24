@@ -13,10 +13,20 @@ const JoinGame = () => {
         <Container>
             <Row className="justify-content-md-center">
                 <Col>
-                    <h1>Create Game</h1>
+                    <h1>Instructions</h1>
+                    <ul>
+                        <li>The game requires 1 game master and at least 2 players to start the game</li>
+                        <li>A game master must first create a game room</li>
+                        <li>Then players can join the game room by using the name</li>
+                    </ul>
+                </Col>
+            </Row>
+            <Row className="justify-content-md-center">
+                <Col>
+                    <h1>Create Game Room</h1>
                     <Form>
-                        <Form.Control placeholder="Room name" type="text" onChange={(event) => setRoomName(event.target.value)}/>
-                        <Form.Control placeholder="Master name" type="text" onChange={(event) => setMasterName(event.target.value)}/>
+                        <Form.Control placeholder="Game room name" type="text" onChange={(event) => setRoomName(event.target.value)}/>
+                        <Form.Control placeholder="Game Master name" type="text" onChange={(event) => setMasterName(event.target.value)}/>
                         <Link onClick={event => (!roomName) ? event.preventDefault() : null} to={`/gamemaster?roomName=${roomName}&masterName=${masterName}`}>
                             <Button variant="primary" type="submit">Create game</Button>
                         </Link>
@@ -28,7 +38,7 @@ const JoinGame = () => {
                 <Col>
                     <h1>Join Game</h1>
                     <Form>
-                        <Form.Control className="joinInput" placeholder="Room name" type="text" onChange={(event) => setJoinRoomName(event.target.value)}/>
+                        <Form.Control className="joinInput" placeholder="Game room name" type="text" onChange={(event) => setJoinRoomName(event.target.value)}/>
                         <Form.Control placeholder="Player name" type="text" onChange={(event) => setPlayerName(event.target.value)}/>
                         <Link onClick={event => (!joinRoomName) ? event.preventDefault() : null} to={`/gameplayer?joinRoomName=${joinRoomName}&playerName=${playerName}`}>
                             <Button variant="primary" type="submit">Join game</Button>

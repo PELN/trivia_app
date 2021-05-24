@@ -1,6 +1,6 @@
 .options-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     grid-gap: 10px;
 }
 
@@ -47,4 +47,10 @@
 
 .correct-answer {
     text-align: center;
+}
+
+@media only screen and (min-width: 768px) {
+    .options-container {
+        grid-template-columns: 1fr 1fr;
+    }
 }

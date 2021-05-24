@@ -23,6 +23,10 @@ const GameMaster = ({ location }) => {
     const [errorMsg, setErrorMsg] = useState('');
     
     const [playersInRoom, setPlayersInRoom] = useState([]);
+    const [playerCount, setPlayerCount] = useState([]);
+
+    const [gameStarted, setGameStarted] = useState([]);
+    const [gameEnded, setGameEnded] = useState([]);
 
     useEffect(() => {
         const { roomName, masterName } = queryString.parse(location.search);
@@ -40,6 +44,7 @@ const GameMaster = ({ location }) => {
 
         socket.on('playerData', (allPlayersInRoom) => {
             setPlayersInRoom(allPlayersInRoom);
+            setPlayerCount(allPlayersInRoom.length);
         });
 
         return () => {
@@ -61,6 +66,8 @@ const GameMaster = ({ location }) => {
     const InitGame = () => {
         socket.emit('ready', (res) => {
             setServerResMsg(res);
+            setGameStarted(true);
+            setGameEnded(false);
         });
     };
 
@@ -98,7 +105,8 @@ const GameMaster = ({ location }) => {
             sendQuestion(questions);
         } else {
             socket.emit('endGame');
-            setServerResMsg({ res: 'The game has ended! If you want to play again, click Start Game' });
+            setServerResMsg({ res: 'The game has ended! You can play again if there are enough players.' });
+            setGameEnded(true);
         };
     };
     
@@ -111,7 +119,7 @@ const GameMaster = ({ location }) => {
                 };
                 socket.emit('correctAnswer', correctAnswer, playerName);
             };
-            setServerResMsg({ res: 'When all players has answered, click Next question' });
+            setServerResMsg({ res: 'When all players have answered, click Next question' });
         });
     }, [round]);
 
@@ -130,11 +138,38 @@ const GameMaster = ({ location }) => {
                             <strong>{serverResMsg.res}</strong>
                         </div>
                         <div className="button-container">                            
-                            <Button variant="primary" size="md" onClick={InitGame}>Start Game</Button>
-                            <Button variant="primary" size="md" onClick={NextQuestion}>Next question</Button>
+                        
+                        {gameStarted === true ? (
+                            <div>
+                                {gameEnded === true ? (
+                                    <div>
+                                        {playerCount >= 2 ? (    
+                                                <Button variant="primary" size="md" onClick={InitGame}>Play Again</Button>
+                                            ) : (
+                                                <Button variant="primary" disabled size="md" onClick={InitGame}>Play Again</Button>
+                                            )
+                                        }
+                                    </div>
+                                    ) : (
+                                        <Button variant="primary" size="md" onClick={NextQuestion}>Next question</Button>
+                                    )
+                                }
+                            </div>
+                            ) : (
+                                <div>
+                                    {playerCount >= 2 ? (
+                                            <Button variant="primary" size="md" onClick={InitGame}>Start Game</Button>
+                                        ) : (
+                                            <Button variant="primary" disabled size="md" onClick={InitGame}>Start Game</Button>
+                                        )
+                                    }
+                                </div>
+                            )
+                        }
+
                         </div>
                         <div className="players-container">
-                            <h3>Players in room</h3>
+                            <h3>Players in room: {playerCount}</h3>
                             <hr/>
                             {playersInRoom.map((playerInfo, index) =>
                                 <p className="p-players" key={index}>

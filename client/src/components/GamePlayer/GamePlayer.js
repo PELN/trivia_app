@@ -19,6 +19,7 @@ const GamePlayer = ({ location }) => {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
     const [playersInRoom, setPlayersInRoom] = useState([]);
+    const [playerCount, setPlayerCount] = useState([]);
 
     const [gameStart, setGameStart] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState('');
@@ -48,6 +49,7 @@ const GamePlayer = ({ location }) => {
         
         socket.on('playerData', (allPlayersInRoom) => {
             setPlayersInRoom(allPlayersInRoom); // is empty the first time, but it is set the next time
+            setPlayerCount(allPlayersInRoom.length);
         });
 
         return () => {
@@ -112,9 +114,9 @@ const GamePlayer = ({ location }) => {
                     { gameStart === false ? (
                         <div>
                             <h2>Hello, Game player {playerName}!</h2>
-                            <p><strong>Waiting for game master to start the game...</strong></p>
+                            <p><strong>Waiting for Game Master to start the game...</strong></p>
                             <div className="players-container">
-                                <h3>Players in room</h3>
+                                <h3>Players in room: {playerCount}</h3>
                                 <hr/>
                                 {playersInRoom.map((playerInfo, index) => 
                                     <p className="p-players" key={index}>
