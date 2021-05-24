@@ -39,9 +39,7 @@ Have node.js, npm, nodemon, react-scripts installed.
 
 10. and so on, for as many rounds there are
 
-11. when the game is finished, the scores of each player are dispalyed - they can either save it to a highscore list or leave the game
-
-12. they can continue playing in the same "room" if they stay, and the game master clicks "Start Game" again 
+11. when the game is finished, the scores of each player are dispalyed - they can save it to a highscore list, leave the game, or stay to play again
 
 ## Demo
 ![demo2](https://user-images.githubusercontent.com/31202787/119366573-684c5b80-bcb1-11eb-965e-283f656f647c.gif)
