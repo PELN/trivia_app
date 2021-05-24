@@ -16,6 +16,8 @@ For the frontend, I have used React Hooks and bootstrap (the design/UX was not p
 
 ## Guide
 
+Have node.js, npm and nodemon installed.
+
 1. git clone project
 
 2. in the terminal, cd into server folder and run npm start
