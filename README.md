@@ -40,3 +40,5 @@ Have node.js, npm, nodemon, react-scripts installed.
 
 11. when game is finished, the scores of each player are dispalyed - they can either save it to a highscore list or leave the game
 
+## Screenshots of project
+
